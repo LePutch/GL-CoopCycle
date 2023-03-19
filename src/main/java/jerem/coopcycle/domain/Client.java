@@ -22,22 +22,27 @@ public class Client implements Serializable {
     private Long id;
 
     @NotNull(message = "must not be null")
+    @Size(min = 2, max = 50)
     @Column("first_name")
     private String firstName;
 
     @NotNull(message = "must not be null")
+    @Size(min = 2, max = 50)
     @Column("last_name")
     private String lastName;
 
     @NotNull(message = "must not be null")
+    @Pattern(regexp = "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$")
     @Column("email")
     private String email;
 
     @NotNull(message = "must not be null")
+    @Pattern(regexp = "^(\\+\\d{1,3})?\\s*(\\(\\d{1,3}\\)|\\d{1,3})\\s*(\\d{3})\\s*(\\d{2})\\s*(\\d{2})$")
     @Column("phone")
     private String phone;
 
     @NotNull(message = "must not be null")
+    @Size(min = 5, max = 100)
     @Column("address")
     private String address;
 

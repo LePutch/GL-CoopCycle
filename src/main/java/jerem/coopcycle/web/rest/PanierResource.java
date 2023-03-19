@@ -8,8 +8,9 @@ import java.util.Objects;
 import java.util.Optional;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import jerem.coopcycle.domain.Panier;
 import jerem.coopcycle.repository.PanierRepository;
+import jerem.coopcycle.service.PanierService;
+import jerem.coopcycle.service.dto.PanierDTO;
 import jerem.coopcycle.web.rest.errors.BadRequestAlertException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +23,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.reactive.ServerHttpRequest;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -37,7 +37,6 @@ import tech.jhipster.web.util.reactive.ResponseUtil;
  */
 @RestController
 @RequestMapping("/api")
-@Transactional
 public class PanierResource {
 
     private final Logger log = LoggerFactory.getLogger(PanierResource.class);
@@ -47,27 +46,30 @@ public class PanierResource {
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
 
+    private final PanierService panierService;
+
     private final PanierRepository panierRepository;
 
-    public PanierResource(PanierRepository panierRepository) {
+    public PanierResource(PanierService panierService, PanierRepository panierRepository) {
+        this.panierService = panierService;
         this.panierRepository = panierRepository;
     }
 
     /**
      * {@code POST  /paniers} : Create a new panier.
      *
-     * @param panier the panier to create.
-     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new panier, or with status {@code 400 (Bad Request)} if the panier has already an ID.
+     * @param panierDTO the panierDTO to create.
+     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new panierDTO, or with status {@code 400 (Bad Request)} if the panier has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("/paniers")
-    public Mono<ResponseEntity<Panier>> createPanier(@Valid @RequestBody Panier panier) throws URISyntaxException {
-        log.debug("REST request to save Panier : {}", panier);
-        if (panier.getId() != null) {
+    public Mono<ResponseEntity<PanierDTO>> createPanier(@Valid @RequestBody PanierDTO panierDTO) throws URISyntaxException {
+        log.debug("REST request to save Panier : {}", panierDTO);
+        if (panierDTO.getId() != null) {
             throw new BadRequestAlertException("A new panier cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        return panierRepository
-            .save(panier)
+        return panierService
+            .save(panierDTO)
             .map(result -> {
                 try {
                     return ResponseEntity
@@ -83,23 +85,23 @@ public class PanierResource {
     /**
      * {@code PUT  /paniers/:id} : Updates an existing panier.
      *
-     * @param id the id of the panier to save.
-     * @param panier the panier to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated panier,
-     * or with status {@code 400 (Bad Request)} if the panier is not valid,
-     * or with status {@code 500 (Internal Server Error)} if the panier couldn't be updated.
+     * @param id the id of the panierDTO to save.
+     * @param panierDTO the panierDTO to update.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated panierDTO,
+     * or with status {@code 400 (Bad Request)} if the panierDTO is not valid,
+     * or with status {@code 500 (Internal Server Error)} if the panierDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/paniers/{id}")
-    public Mono<ResponseEntity<Panier>> updatePanier(
+    public Mono<ResponseEntity<PanierDTO>> updatePanier(
         @PathVariable(value = "id", required = false) final Long id,
-        @Valid @RequestBody Panier panier
+        @Valid @RequestBody PanierDTO panierDTO
     ) throws URISyntaxException {
-        log.debug("REST request to update Panier : {}, {}", id, panier);
-        if (panier.getId() == null) {
+        log.debug("REST request to update Panier : {}, {}", id, panierDTO);
+        if (panierDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-        if (!Objects.equals(id, panier.getId())) {
+        if (!Objects.equals(id, panierDTO.getId())) {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
@@ -110,8 +112,8 @@ public class PanierResource {
                     return Mono.error(new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
                 }
 
-                return panierRepository
-                    .save(panier)
+                return panierService
+                    .update(panierDTO)
                     .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
                     .map(result ->
                         ResponseEntity
@@ -125,24 +127,24 @@ public class PanierResource {
     /**
      * {@code PATCH  /paniers/:id} : Partial updates given fields of an existing panier, field will ignore if it is null
      *
-     * @param id the id of the panier to save.
-     * @param panier the panier to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated panier,
-     * or with status {@code 400 (Bad Request)} if the panier is not valid,
-     * or with status {@code 404 (Not Found)} if the panier is not found,
-     * or with status {@code 500 (Internal Server Error)} if the panier couldn't be updated.
+     * @param id the id of the panierDTO to save.
+     * @param panierDTO the panierDTO to update.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated panierDTO,
+     * or with status {@code 400 (Bad Request)} if the panierDTO is not valid,
+     * or with status {@code 404 (Not Found)} if the panierDTO is not found,
+     * or with status {@code 500 (Internal Server Error)} if the panierDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/paniers/{id}", consumes = { "application/json", "application/merge-patch+json" })
-    public Mono<ResponseEntity<Panier>> partialUpdatePanier(
+    public Mono<ResponseEntity<PanierDTO>> partialUpdatePanier(
         @PathVariable(value = "id", required = false) final Long id,
-        @NotNull @RequestBody Panier panier
+        @NotNull @RequestBody PanierDTO panierDTO
     ) throws URISyntaxException {
-        log.debug("REST request to partial update Panier partially : {}, {}", id, panier);
-        if (panier.getId() == null) {
+        log.debug("REST request to partial update Panier partially : {}, {}", id, panierDTO);
+        if (panierDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-        if (!Objects.equals(id, panier.getId())) {
+        if (!Objects.equals(id, panierDTO.getId())) {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
@@ -153,19 +155,7 @@ public class PanierResource {
                     return Mono.error(new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
                 }
 
-                Mono<Panier> result = panierRepository
-                    .findById(panier.getId())
-                    .map(existingPanier -> {
-                        if (panier.getDescription() != null) {
-                            existingPanier.setDescription(panier.getDescription());
-                        }
-                        if (panier.getPrice() != null) {
-                            existingPanier.setPrice(panier.getPrice());
-                        }
-
-                        return existingPanier;
-                    })
-                    .flatMap(panierRepository::save);
+                Mono<PanierDTO> result = panierService.partialUpdate(panierDTO);
 
                 return result
                     .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
@@ -186,14 +176,14 @@ public class PanierResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of paniers in body.
      */
     @GetMapping("/paniers")
-    public Mono<ResponseEntity<List<Panier>>> getAllPaniers(
+    public Mono<ResponseEntity<List<PanierDTO>>> getAllPaniers(
         @org.springdoc.api.annotations.ParameterObject Pageable pageable,
         ServerHttpRequest request
     ) {
         log.debug("REST request to get a page of Paniers");
-        return panierRepository
-            .count()
-            .zipWith(panierRepository.findAllBy(pageable).collectList())
+        return panierService
+            .countAll()
+            .zipWith(panierService.findAll(pageable).collectList())
             .map(countWithEntities ->
                 ResponseEntity
                     .ok()
@@ -210,27 +200,27 @@ public class PanierResource {
     /**
      * {@code GET  /paniers/:id} : get the "id" panier.
      *
-     * @param id the id of the panier to retrieve.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the panier, or with status {@code 404 (Not Found)}.
+     * @param id the id of the panierDTO to retrieve.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the panierDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/paniers/{id}")
-    public Mono<ResponseEntity<Panier>> getPanier(@PathVariable Long id) {
+    public Mono<ResponseEntity<PanierDTO>> getPanier(@PathVariable Long id) {
         log.debug("REST request to get Panier : {}", id);
-        Mono<Panier> panier = panierRepository.findById(id);
-        return ResponseUtil.wrapOrNotFound(panier);
+        Mono<PanierDTO> panierDTO = panierService.findOne(id);
+        return ResponseUtil.wrapOrNotFound(panierDTO);
     }
 
     /**
      * {@code DELETE  /paniers/:id} : delete the "id" panier.
      *
-     * @param id the id of the panier to delete.
+     * @param id the id of the panierDTO to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/paniers/{id}")
     public Mono<ResponseEntity<Void>> deletePanier(@PathVariable Long id) {
         log.debug("REST request to delete Panier : {}", id);
-        return panierRepository
-            .deleteById(id)
+        return panierService
+            .delete(id)
             .then(
                 Mono.just(
                     ResponseEntity

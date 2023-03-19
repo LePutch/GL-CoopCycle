@@ -44,19 +44,22 @@ export class ClientFormService {
         }
       ),
       firstName: new FormControl(clientRawValue.firstName, {
-        validators: [Validators.required],
+        validators: [Validators.required, Validators.minLength(2), Validators.maxLength(50)],
       }),
       lastName: new FormControl(clientRawValue.lastName, {
-        validators: [Validators.required],
+        validators: [Validators.required, Validators.minLength(2), Validators.maxLength(50)],
       }),
       email: new FormControl(clientRawValue.email, {
-        validators: [Validators.required],
+        validators: [Validators.required, Validators.pattern('^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$')],
       }),
       phone: new FormControl(clientRawValue.phone, {
-        validators: [Validators.required],
+        validators: [
+          Validators.required,
+          Validators.pattern('^(\\+\\d{1,3})?\\s*(\\(\\d{1,3}\\)|\\d{1,3})\\s*(\\d{3})\\s*(\\d{2})\\s*(\\d{2})$'),
+        ],
       }),
       address: new FormControl(clientRawValue.address, {
-        validators: [Validators.required],
+        validators: [Validators.required, Validators.minLength(5), Validators.maxLength(100)],
       }),
       commande: new FormControl(clientRawValue.commande),
     });

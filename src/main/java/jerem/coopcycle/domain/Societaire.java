@@ -25,10 +25,12 @@ public class Societaire implements Serializable {
     private Long id;
 
     @NotNull(message = "must not be null")
+    @Size(min = 2, max = 50)
     @Column("first_name")
     private String firstName;
 
     @NotNull(message = "must not be null")
+    @Size(min = 2, max = 50)
     @Column("last_name")
     private String lastName;
 

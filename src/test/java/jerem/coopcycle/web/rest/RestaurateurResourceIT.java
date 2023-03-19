@@ -12,6 +12,8 @@ import jerem.coopcycle.IntegrationTest;
 import jerem.coopcycle.domain.Restaurateur;
 import jerem.coopcycle.repository.EntityManager;
 import jerem.coopcycle.repository.RestaurateurRepository;
+import jerem.coopcycle.service.dto.RestaurateurDTO;
+import jerem.coopcycle.service.mapper.RestaurateurMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -43,6 +45,9 @@ class RestaurateurResourceIT {
 
     @Autowired
     private RestaurateurRepository restaurateurRepository;
+
+    @Autowired
+    private RestaurateurMapper restaurateurMapper;
 
     @Autowired
     private EntityManager em;
@@ -97,11 +102,12 @@ class RestaurateurResourceIT {
     void createRestaurateur() throws Exception {
         int databaseSizeBeforeCreate = restaurateurRepository.findAll().collectList().block().size();
         // Create the Restaurateur
+        RestaurateurDTO restaurateurDTO = restaurateurMapper.toDto(restaurateur);
         webTestClient
             .post()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(restaurateur))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(restaurateurDTO))
             .exchange()
             .expectStatus()
             .isCreated();
@@ -118,6 +124,7 @@ class RestaurateurResourceIT {
     void createRestaurateurWithExistingId() throws Exception {
         // Create the Restaurateur with an existing ID
         restaurateur.setId(1L);
+        RestaurateurDTO restaurateurDTO = restaurateurMapper.toDto(restaurateur);
 
         int databaseSizeBeforeCreate = restaurateurRepository.findAll().collectList().block().size();
 
@@ -126,7 +133,7 @@ class RestaurateurResourceIT {
             .post()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(restaurateur))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(restaurateurDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -143,12 +150,13 @@ class RestaurateurResourceIT {
         restaurateur.setFirstName(null);
 
         // Create the Restaurateur, which fails.
+        RestaurateurDTO restaurateurDTO = restaurateurMapper.toDto(restaurateur);
 
         webTestClient
             .post()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(restaurateur))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(restaurateurDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -164,12 +172,13 @@ class RestaurateurResourceIT {
         restaurateur.setLastName(null);
 
         // Create the Restaurateur, which fails.
+        RestaurateurDTO restaurateurDTO = restaurateurMapper.toDto(restaurateur);
 
         webTestClient
             .post()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(restaurateur))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(restaurateurDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -248,12 +257,13 @@ class RestaurateurResourceIT {
         // Update the restaurateur
         Restaurateur updatedRestaurateur = restaurateurRepository.findById(restaurateur.getId()).block();
         updatedRestaurateur.firstName(UPDATED_FIRST_NAME).lastName(UPDATED_LAST_NAME);
+        RestaurateurDTO restaurateurDTO = restaurateurMapper.toDto(updatedRestaurateur);
 
         webTestClient
             .put()
-            .uri(ENTITY_API_URL_ID, updatedRestaurateur.getId())
+            .uri(ENTITY_API_URL_ID, restaurateurDTO.getId())
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(updatedRestaurateur))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(restaurateurDTO))
             .exchange()
             .expectStatus()
             .isOk();
@@ -271,12 +281,15 @@ class RestaurateurResourceIT {
         int databaseSizeBeforeUpdate = restaurateurRepository.findAll().collectList().block().size();
         restaurateur.setId(count.incrementAndGet());
 
+        // Create the Restaurateur
+        RestaurateurDTO restaurateurDTO = restaurateurMapper.toDto(restaurateur);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         webTestClient
             .put()
-            .uri(ENTITY_API_URL_ID, restaurateur.getId())
+            .uri(ENTITY_API_URL_ID, restaurateurDTO.getId())
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(restaurateur))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(restaurateurDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -291,12 +304,15 @@ class RestaurateurResourceIT {
         int databaseSizeBeforeUpdate = restaurateurRepository.findAll().collectList().block().size();
         restaurateur.setId(count.incrementAndGet());
 
+        // Create the Restaurateur
+        RestaurateurDTO restaurateurDTO = restaurateurMapper.toDto(restaurateur);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         webTestClient
             .put()
             .uri(ENTITY_API_URL_ID, count.incrementAndGet())
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(restaurateur))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(restaurateurDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -311,12 +327,15 @@ class RestaurateurResourceIT {
         int databaseSizeBeforeUpdate = restaurateurRepository.findAll().collectList().block().size();
         restaurateur.setId(count.incrementAndGet());
 
+        // Create the Restaurateur
+        RestaurateurDTO restaurateurDTO = restaurateurMapper.toDto(restaurateur);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         webTestClient
             .put()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(restaurateur))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(restaurateurDTO))
             .exchange()
             .expectStatus()
             .isEqualTo(405);
@@ -391,12 +410,15 @@ class RestaurateurResourceIT {
         int databaseSizeBeforeUpdate = restaurateurRepository.findAll().collectList().block().size();
         restaurateur.setId(count.incrementAndGet());
 
+        // Create the Restaurateur
+        RestaurateurDTO restaurateurDTO = restaurateurMapper.toDto(restaurateur);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         webTestClient
             .patch()
-            .uri(ENTITY_API_URL_ID, restaurateur.getId())
+            .uri(ENTITY_API_URL_ID, restaurateurDTO.getId())
             .contentType(MediaType.valueOf("application/merge-patch+json"))
-            .bodyValue(TestUtil.convertObjectToJsonBytes(restaurateur))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(restaurateurDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -411,12 +433,15 @@ class RestaurateurResourceIT {
         int databaseSizeBeforeUpdate = restaurateurRepository.findAll().collectList().block().size();
         restaurateur.setId(count.incrementAndGet());
 
+        // Create the Restaurateur
+        RestaurateurDTO restaurateurDTO = restaurateurMapper.toDto(restaurateur);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         webTestClient
             .patch()
             .uri(ENTITY_API_URL_ID, count.incrementAndGet())
             .contentType(MediaType.valueOf("application/merge-patch+json"))
-            .bodyValue(TestUtil.convertObjectToJsonBytes(restaurateur))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(restaurateurDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -431,12 +456,15 @@ class RestaurateurResourceIT {
         int databaseSizeBeforeUpdate = restaurateurRepository.findAll().collectList().block().size();
         restaurateur.setId(count.incrementAndGet());
 
+        // Create the Restaurateur
+        RestaurateurDTO restaurateurDTO = restaurateurMapper.toDto(restaurateur);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         webTestClient
             .patch()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.valueOf("application/merge-patch+json"))
-            .bodyValue(TestUtil.convertObjectToJsonBytes(restaurateur))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(restaurateurDTO))
             .exchange()
             .expectStatus()
             .isEqualTo(405);

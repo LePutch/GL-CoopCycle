@@ -1,14 +1,15 @@
 {
   "applications": "*",
   "changelogDate": "20230319150142",
-  "dto": "no",
+  "dto": "mapstruct",
   "embedded": false,
   "entityTableName": "paiement",
   "fields": [
     {
       "fieldName": "amount",
       "fieldType": "Float",
-      "fieldValidateRules": ["required"]
+      "fieldValidateRules": ["required", "min"],
+      "fieldValidateRulesMin": "0"
     },
     {
       "fieldName": "paymentType",
@@ -23,5 +24,5 @@
   "pagination": "pagination",
   "readOnly": false,
   "relationships": [],
-  "service": "no"
+  "service": "serviceClass"
 }

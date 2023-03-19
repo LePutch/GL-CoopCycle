@@ -8,8 +8,9 @@ import java.util.Objects;
 import java.util.Optional;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import jerem.coopcycle.domain.Societaire;
 import jerem.coopcycle.repository.SocietaireRepository;
+import jerem.coopcycle.service.SocietaireService;
+import jerem.coopcycle.service.dto.SocietaireDTO;
 import jerem.coopcycle.web.rest.errors.BadRequestAlertException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +23,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.reactive.ServerHttpRequest;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -37,7 +37,6 @@ import tech.jhipster.web.util.reactive.ResponseUtil;
  */
 @RestController
 @RequestMapping("/api")
-@Transactional
 public class SocietaireResource {
 
     private final Logger log = LoggerFactory.getLogger(SocietaireResource.class);
@@ -47,27 +46,30 @@ public class SocietaireResource {
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
 
+    private final SocietaireService societaireService;
+
     private final SocietaireRepository societaireRepository;
 
-    public SocietaireResource(SocietaireRepository societaireRepository) {
+    public SocietaireResource(SocietaireService societaireService, SocietaireRepository societaireRepository) {
+        this.societaireService = societaireService;
         this.societaireRepository = societaireRepository;
     }
 
     /**
      * {@code POST  /societaires} : Create a new societaire.
      *
-     * @param societaire the societaire to create.
-     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new societaire, or with status {@code 400 (Bad Request)} if the societaire has already an ID.
+     * @param societaireDTO the societaireDTO to create.
+     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new societaireDTO, or with status {@code 400 (Bad Request)} if the societaire has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("/societaires")
-    public Mono<ResponseEntity<Societaire>> createSocietaire(@Valid @RequestBody Societaire societaire) throws URISyntaxException {
-        log.debug("REST request to save Societaire : {}", societaire);
-        if (societaire.getId() != null) {
+    public Mono<ResponseEntity<SocietaireDTO>> createSocietaire(@Valid @RequestBody SocietaireDTO societaireDTO) throws URISyntaxException {
+        log.debug("REST request to save Societaire : {}", societaireDTO);
+        if (societaireDTO.getId() != null) {
             throw new BadRequestAlertException("A new societaire cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        return societaireRepository
-            .save(societaire)
+        return societaireService
+            .save(societaireDTO)
             .map(result -> {
                 try {
                     return ResponseEntity
@@ -83,23 +85,23 @@ public class SocietaireResource {
     /**
      * {@code PUT  /societaires/:id} : Updates an existing societaire.
      *
-     * @param id the id of the societaire to save.
-     * @param societaire the societaire to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated societaire,
-     * or with status {@code 400 (Bad Request)} if the societaire is not valid,
-     * or with status {@code 500 (Internal Server Error)} if the societaire couldn't be updated.
+     * @param id the id of the societaireDTO to save.
+     * @param societaireDTO the societaireDTO to update.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated societaireDTO,
+     * or with status {@code 400 (Bad Request)} if the societaireDTO is not valid,
+     * or with status {@code 500 (Internal Server Error)} if the societaireDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/societaires/{id}")
-    public Mono<ResponseEntity<Societaire>> updateSocietaire(
+    public Mono<ResponseEntity<SocietaireDTO>> updateSocietaire(
         @PathVariable(value = "id", required = false) final Long id,
-        @Valid @RequestBody Societaire societaire
+        @Valid @RequestBody SocietaireDTO societaireDTO
     ) throws URISyntaxException {
-        log.debug("REST request to update Societaire : {}, {}", id, societaire);
-        if (societaire.getId() == null) {
+        log.debug("REST request to update Societaire : {}, {}", id, societaireDTO);
+        if (societaireDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-        if (!Objects.equals(id, societaire.getId())) {
+        if (!Objects.equals(id, societaireDTO.getId())) {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
@@ -110,8 +112,8 @@ public class SocietaireResource {
                     return Mono.error(new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
                 }
 
-                return societaireRepository
-                    .save(societaire)
+                return societaireService
+                    .update(societaireDTO)
                     .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
                     .map(result ->
                         ResponseEntity
@@ -125,24 +127,24 @@ public class SocietaireResource {
     /**
      * {@code PATCH  /societaires/:id} : Partial updates given fields of an existing societaire, field will ignore if it is null
      *
-     * @param id the id of the societaire to save.
-     * @param societaire the societaire to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated societaire,
-     * or with status {@code 400 (Bad Request)} if the societaire is not valid,
-     * or with status {@code 404 (Not Found)} if the societaire is not found,
-     * or with status {@code 500 (Internal Server Error)} if the societaire couldn't be updated.
+     * @param id the id of the societaireDTO to save.
+     * @param societaireDTO the societaireDTO to update.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated societaireDTO,
+     * or with status {@code 400 (Bad Request)} if the societaireDTO is not valid,
+     * or with status {@code 404 (Not Found)} if the societaireDTO is not found,
+     * or with status {@code 500 (Internal Server Error)} if the societaireDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/societaires/{id}", consumes = { "application/json", "application/merge-patch+json" })
-    public Mono<ResponseEntity<Societaire>> partialUpdateSocietaire(
+    public Mono<ResponseEntity<SocietaireDTO>> partialUpdateSocietaire(
         @PathVariable(value = "id", required = false) final Long id,
-        @NotNull @RequestBody Societaire societaire
+        @NotNull @RequestBody SocietaireDTO societaireDTO
     ) throws URISyntaxException {
-        log.debug("REST request to partial update Societaire partially : {}, {}", id, societaire);
-        if (societaire.getId() == null) {
+        log.debug("REST request to partial update Societaire partially : {}, {}", id, societaireDTO);
+        if (societaireDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-        if (!Objects.equals(id, societaire.getId())) {
+        if (!Objects.equals(id, societaireDTO.getId())) {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
@@ -153,22 +155,7 @@ public class SocietaireResource {
                     return Mono.error(new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
                 }
 
-                Mono<Societaire> result = societaireRepository
-                    .findById(societaire.getId())
-                    .map(existingSocietaire -> {
-                        if (societaire.getFirstName() != null) {
-                            existingSocietaire.setFirstName(societaire.getFirstName());
-                        }
-                        if (societaire.getLastName() != null) {
-                            existingSocietaire.setLastName(societaire.getLastName());
-                        }
-                        if (societaire.getType() != null) {
-                            existingSocietaire.setType(societaire.getType());
-                        }
-
-                        return existingSocietaire;
-                    })
-                    .flatMap(societaireRepository::save);
+                Mono<SocietaireDTO> result = societaireService.partialUpdate(societaireDTO);
 
                 return result
                     .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
@@ -189,14 +176,14 @@ public class SocietaireResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of societaires in body.
      */
     @GetMapping("/societaires")
-    public Mono<ResponseEntity<List<Societaire>>> getAllSocietaires(
+    public Mono<ResponseEntity<List<SocietaireDTO>>> getAllSocietaires(
         @org.springdoc.api.annotations.ParameterObject Pageable pageable,
         ServerHttpRequest request
     ) {
         log.debug("REST request to get a page of Societaires");
-        return societaireRepository
-            .count()
-            .zipWith(societaireRepository.findAllBy(pageable).collectList())
+        return societaireService
+            .countAll()
+            .zipWith(societaireService.findAll(pageable).collectList())
             .map(countWithEntities ->
                 ResponseEntity
                     .ok()
@@ -213,27 +200,27 @@ public class SocietaireResource {
     /**
      * {@code GET  /societaires/:id} : get the "id" societaire.
      *
-     * @param id the id of the societaire to retrieve.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the societaire, or with status {@code 404 (Not Found)}.
+     * @param id the id of the societaireDTO to retrieve.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the societaireDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/societaires/{id}")
-    public Mono<ResponseEntity<Societaire>> getSocietaire(@PathVariable Long id) {
+    public Mono<ResponseEntity<SocietaireDTO>> getSocietaire(@PathVariable Long id) {
         log.debug("REST request to get Societaire : {}", id);
-        Mono<Societaire> societaire = societaireRepository.findById(id);
-        return ResponseUtil.wrapOrNotFound(societaire);
+        Mono<SocietaireDTO> societaireDTO = societaireService.findOne(id);
+        return ResponseUtil.wrapOrNotFound(societaireDTO);
     }
 
     /**
      * {@code DELETE  /societaires/:id} : delete the "id" societaire.
      *
-     * @param id the id of the societaire to delete.
+     * @param id the id of the societaireDTO to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/societaires/{id}")
     public Mono<ResponseEntity<Void>> deleteSocietaire(@PathVariable Long id) {
         log.debug("REST request to delete Societaire : {}", id);
-        return societaireRepository
-            .deleteById(id)
+        return societaireService
+            .delete(id)
             .then(
                 Mono.just(
                     ResponseEntity

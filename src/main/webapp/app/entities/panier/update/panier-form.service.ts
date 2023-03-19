@@ -40,9 +40,11 @@ export class PanierFormService {
           validators: [Validators.required],
         }
       ),
-      description: new FormControl(panierRawValue.description),
+      description: new FormControl(panierRawValue.description, {
+        validators: [Validators.minLength(5), Validators.maxLength(500)],
+      }),
       price: new FormControl(panierRawValue.price, {
-        validators: [Validators.required],
+        validators: [Validators.required, Validators.min(0)],
       }),
       restaurant: new FormControl(panierRawValue.restaurant),
     });

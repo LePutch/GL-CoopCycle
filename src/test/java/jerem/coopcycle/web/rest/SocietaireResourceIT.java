@@ -13,6 +13,8 @@ import jerem.coopcycle.domain.Societaire;
 import jerem.coopcycle.domain.enumeration.SocietaireType;
 import jerem.coopcycle.repository.EntityManager;
 import jerem.coopcycle.repository.SocietaireRepository;
+import jerem.coopcycle.service.dto.SocietaireDTO;
+import jerem.coopcycle.service.mapper.SocietaireMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,6 +49,9 @@ class SocietaireResourceIT {
 
     @Autowired
     private SocietaireRepository societaireRepository;
+
+    @Autowired
+    private SocietaireMapper societaireMapper;
 
     @Autowired
     private EntityManager em;
@@ -101,11 +106,12 @@ class SocietaireResourceIT {
     void createSocietaire() throws Exception {
         int databaseSizeBeforeCreate = societaireRepository.findAll().collectList().block().size();
         // Create the Societaire
+        SocietaireDTO societaireDTO = societaireMapper.toDto(societaire);
         webTestClient
             .post()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(societaire))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(societaireDTO))
             .exchange()
             .expectStatus()
             .isCreated();
@@ -123,6 +129,7 @@ class SocietaireResourceIT {
     void createSocietaireWithExistingId() throws Exception {
         // Create the Societaire with an existing ID
         societaire.setId(1L);
+        SocietaireDTO societaireDTO = societaireMapper.toDto(societaire);
 
         int databaseSizeBeforeCreate = societaireRepository.findAll().collectList().block().size();
 
@@ -131,7 +138,7 @@ class SocietaireResourceIT {
             .post()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(societaire))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(societaireDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -148,12 +155,13 @@ class SocietaireResourceIT {
         societaire.setFirstName(null);
 
         // Create the Societaire, which fails.
+        SocietaireDTO societaireDTO = societaireMapper.toDto(societaire);
 
         webTestClient
             .post()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(societaire))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(societaireDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -169,12 +177,13 @@ class SocietaireResourceIT {
         societaire.setLastName(null);
 
         // Create the Societaire, which fails.
+        SocietaireDTO societaireDTO = societaireMapper.toDto(societaire);
 
         webTestClient
             .post()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(societaire))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(societaireDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -190,12 +199,13 @@ class SocietaireResourceIT {
         societaire.setType(null);
 
         // Create the Societaire, which fails.
+        SocietaireDTO societaireDTO = societaireMapper.toDto(societaire);
 
         webTestClient
             .post()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(societaire))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(societaireDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -278,12 +288,13 @@ class SocietaireResourceIT {
         // Update the societaire
         Societaire updatedSocietaire = societaireRepository.findById(societaire.getId()).block();
         updatedSocietaire.firstName(UPDATED_FIRST_NAME).lastName(UPDATED_LAST_NAME).type(UPDATED_TYPE);
+        SocietaireDTO societaireDTO = societaireMapper.toDto(updatedSocietaire);
 
         webTestClient
             .put()
-            .uri(ENTITY_API_URL_ID, updatedSocietaire.getId())
+            .uri(ENTITY_API_URL_ID, societaireDTO.getId())
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(updatedSocietaire))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(societaireDTO))
             .exchange()
             .expectStatus()
             .isOk();
@@ -302,12 +313,15 @@ class SocietaireResourceIT {
         int databaseSizeBeforeUpdate = societaireRepository.findAll().collectList().block().size();
         societaire.setId(count.incrementAndGet());
 
+        // Create the Societaire
+        SocietaireDTO societaireDTO = societaireMapper.toDto(societaire);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         webTestClient
             .put()
-            .uri(ENTITY_API_URL_ID, societaire.getId())
+            .uri(ENTITY_API_URL_ID, societaireDTO.getId())
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(societaire))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(societaireDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -322,12 +336,15 @@ class SocietaireResourceIT {
         int databaseSizeBeforeUpdate = societaireRepository.findAll().collectList().block().size();
         societaire.setId(count.incrementAndGet());
 
+        // Create the Societaire
+        SocietaireDTO societaireDTO = societaireMapper.toDto(societaire);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         webTestClient
             .put()
             .uri(ENTITY_API_URL_ID, count.incrementAndGet())
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(societaire))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(societaireDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -342,12 +359,15 @@ class SocietaireResourceIT {
         int databaseSizeBeforeUpdate = societaireRepository.findAll().collectList().block().size();
         societaire.setId(count.incrementAndGet());
 
+        // Create the Societaire
+        SocietaireDTO societaireDTO = societaireMapper.toDto(societaire);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         webTestClient
             .put()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(societaire))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(societaireDTO))
             .exchange()
             .expectStatus()
             .isEqualTo(405);
@@ -424,12 +444,15 @@ class SocietaireResourceIT {
         int databaseSizeBeforeUpdate = societaireRepository.findAll().collectList().block().size();
         societaire.setId(count.incrementAndGet());
 
+        // Create the Societaire
+        SocietaireDTO societaireDTO = societaireMapper.toDto(societaire);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         webTestClient
             .patch()
-            .uri(ENTITY_API_URL_ID, societaire.getId())
+            .uri(ENTITY_API_URL_ID, societaireDTO.getId())
             .contentType(MediaType.valueOf("application/merge-patch+json"))
-            .bodyValue(TestUtil.convertObjectToJsonBytes(societaire))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(societaireDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -444,12 +467,15 @@ class SocietaireResourceIT {
         int databaseSizeBeforeUpdate = societaireRepository.findAll().collectList().block().size();
         societaire.setId(count.incrementAndGet());
 
+        // Create the Societaire
+        SocietaireDTO societaireDTO = societaireMapper.toDto(societaire);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         webTestClient
             .patch()
             .uri(ENTITY_API_URL_ID, count.incrementAndGet())
             .contentType(MediaType.valueOf("application/merge-patch+json"))
-            .bodyValue(TestUtil.convertObjectToJsonBytes(societaire))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(societaireDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -464,12 +490,15 @@ class SocietaireResourceIT {
         int databaseSizeBeforeUpdate = societaireRepository.findAll().collectList().block().size();
         societaire.setId(count.incrementAndGet());
 
+        // Create the Societaire
+        SocietaireDTO societaireDTO = societaireMapper.toDto(societaire);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         webTestClient
             .patch()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.valueOf("application/merge-patch+json"))
-            .bodyValue(TestUtil.convertObjectToJsonBytes(societaire))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(societaireDTO))
             .exchange()
             .expectStatus()
             .isEqualTo(405);

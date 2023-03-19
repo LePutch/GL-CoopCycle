@@ -1,7 +1,7 @@
 {
   "applications": "*",
   "changelogDate": "20230319150140",
-  "dto": "no",
+  "dto": "mapstruct",
   "embedded": false,
   "entityTableName": "commande",
   "fields": [
@@ -49,5 +49,5 @@
       "relationshipType": "one-to-many"
     }
   ],
-  "service": "no"
+  "service": "serviceClass"
 }

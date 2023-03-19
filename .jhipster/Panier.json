@@ -1,7 +1,7 @@
 {
   "applications": "*",
   "changelogDate": "20230319150141",
-  "dto": "no",
+  "dto": "mapstruct",
   "embedded": false,
   "entityTableName": "panier",
   "fields": [
@@ -12,12 +12,16 @@
     },
     {
       "fieldName": "description",
-      "fieldType": "String"
+      "fieldType": "String",
+      "fieldValidateRules": ["minlength", "maxlength"],
+      "fieldValidateRulesMaxlength": "500",
+      "fieldValidateRulesMinlength": "5"
     },
     {
       "fieldName": "price",
       "fieldType": "Float",
-      "fieldValidateRules": ["required"]
+      "fieldValidateRules": ["required", "min"],
+      "fieldValidateRulesMin": "0"
     }
   ],
   "fluentMethods": true,
@@ -33,5 +37,5 @@
       "relationshipType": "many-to-one"
     }
   ],
-  "service": "no"
+  "service": "serviceClass"
 }

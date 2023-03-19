@@ -15,13 +15,7 @@ describe('Client e2e test', () => {
   const clientPageUrlPattern = new RegExp('/client(\\?.*)?$');
   const username = Cypress.env('E2E_USERNAME') ?? 'user';
   const password = Cypress.env('E2E_PASSWORD') ?? 'user';
-  const clientSample = {
-    firstName: 'Kaia',
-    lastName: 'Mohr',
-    email: 'Isaias.Hauck81@hotmail.com',
-    phone: '652.438.4862 x391',
-    address: 'Cambridgeshire Peso Mobility',
-  };
+  const clientSample = { firstName: 'Luella', lastName: 'Erdman', email: 'x+j@p4a.n{ga', phone: '   0  986  39  03', address: 'olive' };
 
   let client;
 
@@ -170,11 +164,11 @@ describe('Client e2e test', () => {
 
       cy.get(`[data-cy="lastName"]`).type('Sporer').should('have.value', 'Sporer');
 
-      cy.get(`[data-cy="email"]`).type('Roberto_Jaskolski96@hotmail.com').should('have.value', 'Roberto_Jaskolski96@hotmail.com');
+      cy.get(`[data-cy="email"]`).type('oGwW{@K+qyw.q').should('have.value', 'oGwW{@K+qyw.q');
 
-      cy.get(`[data-cy="phone"]`).type('518.990.8707 x0705').should('have.value', '518.990.8707 x0705');
+      cy.get(`[data-cy="phone"]`).type('+75    349 84  55').should('have.value', '+75    349 84  55');
 
-      cy.get(`[data-cy="address"]`).type('back-end Tunisia blockchains').should('have.value', 'back-end Tunisia blockchains');
+      cy.get(`[data-cy="address"]`).type('didactic Central').should('have.value', 'didactic Central');
 
       cy.get(entityCreateSaveButtonSelector).click();
 

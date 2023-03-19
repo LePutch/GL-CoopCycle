@@ -1,19 +1,23 @@
 {
   "applications": "*",
   "changelogDate": "20230319150136",
-  "dto": "no",
+  "dto": "mapstruct",
   "embedded": false,
   "entityTableName": "societaire",
   "fields": [
     {
       "fieldName": "firstName",
       "fieldType": "String",
-      "fieldValidateRules": ["required"]
+      "fieldValidateRules": ["required", "minlength", "maxlength"],
+      "fieldValidateRulesMaxlength": "50",
+      "fieldValidateRulesMinlength": "2"
     },
     {
       "fieldName": "lastName",
       "fieldType": "String",
-      "fieldValidateRules": ["required"]
+      "fieldValidateRules": ["required", "minlength", "maxlength"],
+      "fieldValidateRulesMaxlength": "50",
+      "fieldValidateRulesMinlength": "2"
     },
     {
       "fieldName": "type",
@@ -35,5 +39,5 @@
       "relationshipType": "one-to-many"
     }
   ],
-  "service": "no"
+  "service": "serviceClass"
 }

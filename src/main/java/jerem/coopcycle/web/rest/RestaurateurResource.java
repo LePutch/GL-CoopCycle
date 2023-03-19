@@ -8,8 +8,9 @@ import java.util.Objects;
 import java.util.Optional;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import jerem.coopcycle.domain.Restaurateur;
 import jerem.coopcycle.repository.RestaurateurRepository;
+import jerem.coopcycle.service.RestaurateurService;
+import jerem.coopcycle.service.dto.RestaurateurDTO;
 import jerem.coopcycle.web.rest.errors.BadRequestAlertException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +23,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.reactive.ServerHttpRequest;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -37,7 +37,6 @@ import tech.jhipster.web.util.reactive.ResponseUtil;
  */
 @RestController
 @RequestMapping("/api")
-@Transactional
 public class RestaurateurResource {
 
     private final Logger log = LoggerFactory.getLogger(RestaurateurResource.class);
@@ -47,27 +46,31 @@ public class RestaurateurResource {
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
 
+    private final RestaurateurService restaurateurService;
+
     private final RestaurateurRepository restaurateurRepository;
 
-    public RestaurateurResource(RestaurateurRepository restaurateurRepository) {
+    public RestaurateurResource(RestaurateurService restaurateurService, RestaurateurRepository restaurateurRepository) {
+        this.restaurateurService = restaurateurService;
         this.restaurateurRepository = restaurateurRepository;
     }
 
     /**
      * {@code POST  /restaurateurs} : Create a new restaurateur.
      *
-     * @param restaurateur the restaurateur to create.
-     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new restaurateur, or with status {@code 400 (Bad Request)} if the restaurateur has already an ID.
+     * @param restaurateurDTO the restaurateurDTO to create.
+     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new restaurateurDTO, or with status {@code 400 (Bad Request)} if the restaurateur has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("/restaurateurs")
-    public Mono<ResponseEntity<Restaurateur>> createRestaurateur(@Valid @RequestBody Restaurateur restaurateur) throws URISyntaxException {
-        log.debug("REST request to save Restaurateur : {}", restaurateur);
-        if (restaurateur.getId() != null) {
+    public Mono<ResponseEntity<RestaurateurDTO>> createRestaurateur(@Valid @RequestBody RestaurateurDTO restaurateurDTO)
+        throws URISyntaxException {
+        log.debug("REST request to save Restaurateur : {}", restaurateurDTO);
+        if (restaurateurDTO.getId() != null) {
             throw new BadRequestAlertException("A new restaurateur cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        return restaurateurRepository
-            .save(restaurateur)
+        return restaurateurService
+            .save(restaurateurDTO)
             .map(result -> {
                 try {
                     return ResponseEntity
@@ -83,23 +86,23 @@ public class RestaurateurResource {
     /**
      * {@code PUT  /restaurateurs/:id} : Updates an existing restaurateur.
      *
-     * @param id the id of the restaurateur to save.
-     * @param restaurateur the restaurateur to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated restaurateur,
-     * or with status {@code 400 (Bad Request)} if the restaurateur is not valid,
-     * or with status {@code 500 (Internal Server Error)} if the restaurateur couldn't be updated.
+     * @param id the id of the restaurateurDTO to save.
+     * @param restaurateurDTO the restaurateurDTO to update.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated restaurateurDTO,
+     * or with status {@code 400 (Bad Request)} if the restaurateurDTO is not valid,
+     * or with status {@code 500 (Internal Server Error)} if the restaurateurDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/restaurateurs/{id}")
-    public Mono<ResponseEntity<Restaurateur>> updateRestaurateur(
+    public Mono<ResponseEntity<RestaurateurDTO>> updateRestaurateur(
         @PathVariable(value = "id", required = false) final Long id,
-        @Valid @RequestBody Restaurateur restaurateur
+        @Valid @RequestBody RestaurateurDTO restaurateurDTO
     ) throws URISyntaxException {
-        log.debug("REST request to update Restaurateur : {}, {}", id, restaurateur);
-        if (restaurateur.getId() == null) {
+        log.debug("REST request to update Restaurateur : {}, {}", id, restaurateurDTO);
+        if (restaurateurDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-        if (!Objects.equals(id, restaurateur.getId())) {
+        if (!Objects.equals(id, restaurateurDTO.getId())) {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
@@ -110,8 +113,8 @@ public class RestaurateurResource {
                     return Mono.error(new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
                 }
 
-                return restaurateurRepository
-                    .save(restaurateur)
+                return restaurateurService
+                    .update(restaurateurDTO)
                     .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
                     .map(result ->
                         ResponseEntity
@@ -125,24 +128,24 @@ public class RestaurateurResource {
     /**
      * {@code PATCH  /restaurateurs/:id} : Partial updates given fields of an existing restaurateur, field will ignore if it is null
      *
-     * @param id the id of the restaurateur to save.
-     * @param restaurateur the restaurateur to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated restaurateur,
-     * or with status {@code 400 (Bad Request)} if the restaurateur is not valid,
-     * or with status {@code 404 (Not Found)} if the restaurateur is not found,
-     * or with status {@code 500 (Internal Server Error)} if the restaurateur couldn't be updated.
+     * @param id the id of the restaurateurDTO to save.
+     * @param restaurateurDTO the restaurateurDTO to update.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated restaurateurDTO,
+     * or with status {@code 400 (Bad Request)} if the restaurateurDTO is not valid,
+     * or with status {@code 404 (Not Found)} if the restaurateurDTO is not found,
+     * or with status {@code 500 (Internal Server Error)} if the restaurateurDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/restaurateurs/{id}", consumes = { "application/json", "application/merge-patch+json" })
-    public Mono<ResponseEntity<Restaurateur>> partialUpdateRestaurateur(
+    public Mono<ResponseEntity<RestaurateurDTO>> partialUpdateRestaurateur(
         @PathVariable(value = "id", required = false) final Long id,
-        @NotNull @RequestBody Restaurateur restaurateur
+        @NotNull @RequestBody RestaurateurDTO restaurateurDTO
     ) throws URISyntaxException {
-        log.debug("REST request to partial update Restaurateur partially : {}, {}", id, restaurateur);
-        if (restaurateur.getId() == null) {
+        log.debug("REST request to partial update Restaurateur partially : {}, {}", id, restaurateurDTO);
+        if (restaurateurDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-        if (!Objects.equals(id, restaurateur.getId())) {
+        if (!Objects.equals(id, restaurateurDTO.getId())) {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
@@ -153,19 +156,7 @@ public class RestaurateurResource {
                     return Mono.error(new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
                 }
 
-                Mono<Restaurateur> result = restaurateurRepository
-                    .findById(restaurateur.getId())
-                    .map(existingRestaurateur -> {
-                        if (restaurateur.getFirstName() != null) {
-                            existingRestaurateur.setFirstName(restaurateur.getFirstName());
-                        }
-                        if (restaurateur.getLastName() != null) {
-                            existingRestaurateur.setLastName(restaurateur.getLastName());
-                        }
-
-                        return existingRestaurateur;
-                    })
-                    .flatMap(restaurateurRepository::save);
+                Mono<RestaurateurDTO> result = restaurateurService.partialUpdate(restaurateurDTO);
 
                 return result
                     .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
@@ -186,14 +177,14 @@ public class RestaurateurResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of restaurateurs in body.
      */
     @GetMapping("/restaurateurs")
-    public Mono<ResponseEntity<List<Restaurateur>>> getAllRestaurateurs(
+    public Mono<ResponseEntity<List<RestaurateurDTO>>> getAllRestaurateurs(
         @org.springdoc.api.annotations.ParameterObject Pageable pageable,
         ServerHttpRequest request
     ) {
         log.debug("REST request to get a page of Restaurateurs");
-        return restaurateurRepository
-            .count()
-            .zipWith(restaurateurRepository.findAllBy(pageable).collectList())
+        return restaurateurService
+            .countAll()
+            .zipWith(restaurateurService.findAll(pageable).collectList())
             .map(countWithEntities ->
                 ResponseEntity
                     .ok()
@@ -210,27 +201,27 @@ public class RestaurateurResource {
     /**
      * {@code GET  /restaurateurs/:id} : get the "id" restaurateur.
      *
-     * @param id the id of the restaurateur to retrieve.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the restaurateur, or with status {@code 404 (Not Found)}.
+     * @param id the id of the restaurateurDTO to retrieve.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the restaurateurDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/restaurateurs/{id}")
-    public Mono<ResponseEntity<Restaurateur>> getRestaurateur(@PathVariable Long id) {
+    public Mono<ResponseEntity<RestaurateurDTO>> getRestaurateur(@PathVariable Long id) {
         log.debug("REST request to get Restaurateur : {}", id);
-        Mono<Restaurateur> restaurateur = restaurateurRepository.findById(id);
-        return ResponseUtil.wrapOrNotFound(restaurateur);
+        Mono<RestaurateurDTO> restaurateurDTO = restaurateurService.findOne(id);
+        return ResponseUtil.wrapOrNotFound(restaurateurDTO);
     }
 
     /**
      * {@code DELETE  /restaurateurs/:id} : delete the "id" restaurateur.
      *
-     * @param id the id of the restaurateur to delete.
+     * @param id the id of the restaurateurDTO to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/restaurateurs/{id}")
     public Mono<ResponseEntity<Void>> deleteRestaurateur(@PathVariable Long id) {
         log.debug("REST request to delete Restaurateur : {}", id);
-        return restaurateurRepository
-            .deleteById(id)
+        return restaurateurService
+            .delete(id)
             .then(
                 Mono.just(
                     ResponseEntity

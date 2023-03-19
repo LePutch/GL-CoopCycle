@@ -8,8 +8,9 @@ import java.util.Objects;
 import java.util.Optional;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import jerem.coopcycle.domain.Client;
 import jerem.coopcycle.repository.ClientRepository;
+import jerem.coopcycle.service.ClientService;
+import jerem.coopcycle.service.dto.ClientDTO;
 import jerem.coopcycle.web.rest.errors.BadRequestAlertException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +23,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.reactive.ServerHttpRequest;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -37,7 +37,6 @@ import tech.jhipster.web.util.reactive.ResponseUtil;
  */
 @RestController
 @RequestMapping("/api")
-@Transactional
 public class ClientResource {
 
     private final Logger log = LoggerFactory.getLogger(ClientResource.class);
@@ -47,27 +46,30 @@ public class ClientResource {
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
 
+    private final ClientService clientService;
+
     private final ClientRepository clientRepository;
 
-    public ClientResource(ClientRepository clientRepository) {
+    public ClientResource(ClientService clientService, ClientRepository clientRepository) {
+        this.clientService = clientService;
         this.clientRepository = clientRepository;
     }
 
     /**
      * {@code POST  /clients} : Create a new client.
      *
-     * @param client the client to create.
-     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new client, or with status {@code 400 (Bad Request)} if the client has already an ID.
+     * @param clientDTO the clientDTO to create.
+     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new clientDTO, or with status {@code 400 (Bad Request)} if the client has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("/clients")
-    public Mono<ResponseEntity<Client>> createClient(@Valid @RequestBody Client client) throws URISyntaxException {
-        log.debug("REST request to save Client : {}", client);
-        if (client.getId() != null) {
+    public Mono<ResponseEntity<ClientDTO>> createClient(@Valid @RequestBody ClientDTO clientDTO) throws URISyntaxException {
+        log.debug("REST request to save Client : {}", clientDTO);
+        if (clientDTO.getId() != null) {
             throw new BadRequestAlertException("A new client cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        return clientRepository
-            .save(client)
+        return clientService
+            .save(clientDTO)
             .map(result -> {
                 try {
                     return ResponseEntity
@@ -83,23 +85,23 @@ public class ClientResource {
     /**
      * {@code PUT  /clients/:id} : Updates an existing client.
      *
-     * @param id the id of the client to save.
-     * @param client the client to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated client,
-     * or with status {@code 400 (Bad Request)} if the client is not valid,
-     * or with status {@code 500 (Internal Server Error)} if the client couldn't be updated.
+     * @param id the id of the clientDTO to save.
+     * @param clientDTO the clientDTO to update.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated clientDTO,
+     * or with status {@code 400 (Bad Request)} if the clientDTO is not valid,
+     * or with status {@code 500 (Internal Server Error)} if the clientDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/clients/{id}")
-    public Mono<ResponseEntity<Client>> updateClient(
+    public Mono<ResponseEntity<ClientDTO>> updateClient(
         @PathVariable(value = "id", required = false) final Long id,
-        @Valid @RequestBody Client client
+        @Valid @RequestBody ClientDTO clientDTO
     ) throws URISyntaxException {
-        log.debug("REST request to update Client : {}, {}", id, client);
-        if (client.getId() == null) {
+        log.debug("REST request to update Client : {}, {}", id, clientDTO);
+        if (clientDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-        if (!Objects.equals(id, client.getId())) {
+        if (!Objects.equals(id, clientDTO.getId())) {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
@@ -110,8 +112,8 @@ public class ClientResource {
                     return Mono.error(new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
                 }
 
-                return clientRepository
-                    .save(client)
+                return clientService
+                    .update(clientDTO)
                     .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
                     .map(result ->
                         ResponseEntity
@@ -125,24 +127,24 @@ public class ClientResource {
     /**
      * {@code PATCH  /clients/:id} : Partial updates given fields of an existing client, field will ignore if it is null
      *
-     * @param id the id of the client to save.
-     * @param client the client to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated client,
-     * or with status {@code 400 (Bad Request)} if the client is not valid,
-     * or with status {@code 404 (Not Found)} if the client is not found,
-     * or with status {@code 500 (Internal Server Error)} if the client couldn't be updated.
+     * @param id the id of the clientDTO to save.
+     * @param clientDTO the clientDTO to update.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated clientDTO,
+     * or with status {@code 400 (Bad Request)} if the clientDTO is not valid,
+     * or with status {@code 404 (Not Found)} if the clientDTO is not found,
+     * or with status {@code 500 (Internal Server Error)} if the clientDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/clients/{id}", consumes = { "application/json", "application/merge-patch+json" })
-    public Mono<ResponseEntity<Client>> partialUpdateClient(
+    public Mono<ResponseEntity<ClientDTO>> partialUpdateClient(
         @PathVariable(value = "id", required = false) final Long id,
-        @NotNull @RequestBody Client client
+        @NotNull @RequestBody ClientDTO clientDTO
     ) throws URISyntaxException {
-        log.debug("REST request to partial update Client partially : {}, {}", id, client);
-        if (client.getId() == null) {
+        log.debug("REST request to partial update Client partially : {}, {}", id, clientDTO);
+        if (clientDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-        if (!Objects.equals(id, client.getId())) {
+        if (!Objects.equals(id, clientDTO.getId())) {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
@@ -153,28 +155,7 @@ public class ClientResource {
                     return Mono.error(new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
                 }
 
-                Mono<Client> result = clientRepository
-                    .findById(client.getId())
-                    .map(existingClient -> {
-                        if (client.getFirstName() != null) {
-                            existingClient.setFirstName(client.getFirstName());
-                        }
-                        if (client.getLastName() != null) {
-                            existingClient.setLastName(client.getLastName());
-                        }
-                        if (client.getEmail() != null) {
-                            existingClient.setEmail(client.getEmail());
-                        }
-                        if (client.getPhone() != null) {
-                            existingClient.setPhone(client.getPhone());
-                        }
-                        if (client.getAddress() != null) {
-                            existingClient.setAddress(client.getAddress());
-                        }
-
-                        return existingClient;
-                    })
-                    .flatMap(clientRepository::save);
+                Mono<ClientDTO> result = clientService.partialUpdate(clientDTO);
 
                 return result
                     .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
@@ -195,14 +176,14 @@ public class ClientResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of clients in body.
      */
     @GetMapping("/clients")
-    public Mono<ResponseEntity<List<Client>>> getAllClients(
+    public Mono<ResponseEntity<List<ClientDTO>>> getAllClients(
         @org.springdoc.api.annotations.ParameterObject Pageable pageable,
         ServerHttpRequest request
     ) {
         log.debug("REST request to get a page of Clients");
-        return clientRepository
-            .count()
-            .zipWith(clientRepository.findAllBy(pageable).collectList())
+        return clientService
+            .countAll()
+            .zipWith(clientService.findAll(pageable).collectList())
             .map(countWithEntities ->
                 ResponseEntity
                     .ok()
@@ -219,27 +200,27 @@ public class ClientResource {
     /**
      * {@code GET  /clients/:id} : get the "id" client.
      *
-     * @param id the id of the client to retrieve.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the client, or with status {@code 404 (Not Found)}.
+     * @param id the id of the clientDTO to retrieve.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the clientDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/clients/{id}")
-    public Mono<ResponseEntity<Client>> getClient(@PathVariable Long id) {
+    public Mono<ResponseEntity<ClientDTO>> getClient(@PathVariable Long id) {
         log.debug("REST request to get Client : {}", id);
-        Mono<Client> client = clientRepository.findById(id);
-        return ResponseUtil.wrapOrNotFound(client);
+        Mono<ClientDTO> clientDTO = clientService.findOne(id);
+        return ResponseUtil.wrapOrNotFound(clientDTO);
     }
 
     /**
      * {@code DELETE  /clients/:id} : delete the "id" client.
      *
-     * @param id the id of the client to delete.
+     * @param id the id of the clientDTO to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/clients/{id}")
     public Mono<ResponseEntity<Void>> deleteClient(@PathVariable Long id) {
         log.debug("REST request to delete Client : {}", id);
-        return clientRepository
-            .deleteById(id)
+        return clientService
+            .delete(id)
             .then(
                 Mono.just(
                     ResponseEntity

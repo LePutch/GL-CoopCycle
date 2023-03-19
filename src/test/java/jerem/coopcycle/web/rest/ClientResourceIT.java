@@ -12,6 +12,8 @@ import jerem.coopcycle.IntegrationTest;
 import jerem.coopcycle.domain.Client;
 import jerem.coopcycle.repository.ClientRepository;
 import jerem.coopcycle.repository.EntityManager;
+import jerem.coopcycle.service.dto.ClientDTO;
+import jerem.coopcycle.service.mapper.ClientMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,11 +37,11 @@ class ClientResourceIT {
     private static final String DEFAULT_LAST_NAME = "AAAAAAAAAA";
     private static final String UPDATED_LAST_NAME = "BBBBBBBBBB";
 
-    private static final String DEFAULT_EMAIL = "AAAAAAAAAA";
-    private static final String UPDATED_EMAIL = "BBBBBBBBBB";
+    private static final String DEFAULT_EMAIL = "pQ<1@S/g.seos";
+    private static final String UPDATED_EMAIL = "\"b@>^T.G";
 
-    private static final String DEFAULT_PHONE = "AAAAAAAAAA";
-    private static final String UPDATED_PHONE = "BBBBBBBBBB";
+    private static final String DEFAULT_PHONE = "+81     (219)    688    39 57";
+    private static final String UPDATED_PHONE = "   560     868 61  50";
 
     private static final String DEFAULT_ADDRESS = "AAAAAAAAAA";
     private static final String UPDATED_ADDRESS = "BBBBBBBBBB";
@@ -52,6 +54,9 @@ class ClientResourceIT {
 
     @Autowired
     private ClientRepository clientRepository;
+
+    @Autowired
+    private ClientMapper clientMapper;
 
     @Autowired
     private EntityManager em;
@@ -116,11 +121,12 @@ class ClientResourceIT {
     void createClient() throws Exception {
         int databaseSizeBeforeCreate = clientRepository.findAll().collectList().block().size();
         // Create the Client
+        ClientDTO clientDTO = clientMapper.toDto(client);
         webTestClient
             .post()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(client))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(clientDTO))
             .exchange()
             .expectStatus()
             .isCreated();
@@ -140,6 +146,7 @@ class ClientResourceIT {
     void createClientWithExistingId() throws Exception {
         // Create the Client with an existing ID
         client.setId(1L);
+        ClientDTO clientDTO = clientMapper.toDto(client);
 
         int databaseSizeBeforeCreate = clientRepository.findAll().collectList().block().size();
 
@@ -148,7 +155,7 @@ class ClientResourceIT {
             .post()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(client))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(clientDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -165,12 +172,13 @@ class ClientResourceIT {
         client.setFirstName(null);
 
         // Create the Client, which fails.
+        ClientDTO clientDTO = clientMapper.toDto(client);
 
         webTestClient
             .post()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(client))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(clientDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -186,12 +194,13 @@ class ClientResourceIT {
         client.setLastName(null);
 
         // Create the Client, which fails.
+        ClientDTO clientDTO = clientMapper.toDto(client);
 
         webTestClient
             .post()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(client))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(clientDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -207,12 +216,13 @@ class ClientResourceIT {
         client.setEmail(null);
 
         // Create the Client, which fails.
+        ClientDTO clientDTO = clientMapper.toDto(client);
 
         webTestClient
             .post()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(client))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(clientDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -228,12 +238,13 @@ class ClientResourceIT {
         client.setPhone(null);
 
         // Create the Client, which fails.
+        ClientDTO clientDTO = clientMapper.toDto(client);
 
         webTestClient
             .post()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(client))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(clientDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -249,12 +260,13 @@ class ClientResourceIT {
         client.setAddress(null);
 
         // Create the Client, which fails.
+        ClientDTO clientDTO = clientMapper.toDto(client);
 
         webTestClient
             .post()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(client))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(clientDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -350,12 +362,13 @@ class ClientResourceIT {
             .email(UPDATED_EMAIL)
             .phone(UPDATED_PHONE)
             .address(UPDATED_ADDRESS);
+        ClientDTO clientDTO = clientMapper.toDto(updatedClient);
 
         webTestClient
             .put()
-            .uri(ENTITY_API_URL_ID, updatedClient.getId())
+            .uri(ENTITY_API_URL_ID, clientDTO.getId())
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(updatedClient))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(clientDTO))
             .exchange()
             .expectStatus()
             .isOk();
@@ -376,12 +389,15 @@ class ClientResourceIT {
         int databaseSizeBeforeUpdate = clientRepository.findAll().collectList().block().size();
         client.setId(count.incrementAndGet());
 
+        // Create the Client
+        ClientDTO clientDTO = clientMapper.toDto(client);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         webTestClient
             .put()
-            .uri(ENTITY_API_URL_ID, client.getId())
+            .uri(ENTITY_API_URL_ID, clientDTO.getId())
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(client))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(clientDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -396,12 +412,15 @@ class ClientResourceIT {
         int databaseSizeBeforeUpdate = clientRepository.findAll().collectList().block().size();
         client.setId(count.incrementAndGet());
 
+        // Create the Client
+        ClientDTO clientDTO = clientMapper.toDto(client);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         webTestClient
             .put()
             .uri(ENTITY_API_URL_ID, count.incrementAndGet())
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(client))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(clientDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -416,12 +435,15 @@ class ClientResourceIT {
         int databaseSizeBeforeUpdate = clientRepository.findAll().collectList().block().size();
         client.setId(count.incrementAndGet());
 
+        // Create the Client
+        ClientDTO clientDTO = clientMapper.toDto(client);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         webTestClient
             .put()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(client))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(clientDTO))
             .exchange()
             .expectStatus()
             .isEqualTo(405);
@@ -442,7 +464,7 @@ class ClientResourceIT {
         Client partialUpdatedClient = new Client();
         partialUpdatedClient.setId(client.getId());
 
-        partialUpdatedClient.firstName(UPDATED_FIRST_NAME).lastName(UPDATED_LAST_NAME).email(UPDATED_EMAIL);
+        partialUpdatedClient.lastName(UPDATED_LAST_NAME).email(UPDATED_EMAIL).phone(UPDATED_PHONE);
 
         webTestClient
             .patch()
@@ -457,10 +479,10 @@ class ClientResourceIT {
         List<Client> clientList = clientRepository.findAll().collectList().block();
         assertThat(clientList).hasSize(databaseSizeBeforeUpdate);
         Client testClient = clientList.get(clientList.size() - 1);
-        assertThat(testClient.getFirstName()).isEqualTo(UPDATED_FIRST_NAME);
+        assertThat(testClient.getFirstName()).isEqualTo(DEFAULT_FIRST_NAME);
         assertThat(testClient.getLastName()).isEqualTo(UPDATED_LAST_NAME);
         assertThat(testClient.getEmail()).isEqualTo(UPDATED_EMAIL);
-        assertThat(testClient.getPhone()).isEqualTo(DEFAULT_PHONE);
+        assertThat(testClient.getPhone()).isEqualTo(UPDATED_PHONE);
         assertThat(testClient.getAddress()).isEqualTo(DEFAULT_ADDRESS);
     }
 
@@ -507,12 +529,15 @@ class ClientResourceIT {
         int databaseSizeBeforeUpdate = clientRepository.findAll().collectList().block().size();
         client.setId(count.incrementAndGet());
 
+        // Create the Client
+        ClientDTO clientDTO = clientMapper.toDto(client);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         webTestClient
             .patch()
-            .uri(ENTITY_API_URL_ID, client.getId())
+            .uri(ENTITY_API_URL_ID, clientDTO.getId())
             .contentType(MediaType.valueOf("application/merge-patch+json"))
-            .bodyValue(TestUtil.convertObjectToJsonBytes(client))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(clientDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -527,12 +552,15 @@ class ClientResourceIT {
         int databaseSizeBeforeUpdate = clientRepository.findAll().collectList().block().size();
         client.setId(count.incrementAndGet());
 
+        // Create the Client
+        ClientDTO clientDTO = clientMapper.toDto(client);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         webTestClient
             .patch()
             .uri(ENTITY_API_URL_ID, count.incrementAndGet())
             .contentType(MediaType.valueOf("application/merge-patch+json"))
-            .bodyValue(TestUtil.convertObjectToJsonBytes(client))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(clientDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -547,12 +575,15 @@ class ClientResourceIT {
         int databaseSizeBeforeUpdate = clientRepository.findAll().collectList().block().size();
         client.setId(count.incrementAndGet());
 
+        // Create the Client
+        ClientDTO clientDTO = clientMapper.toDto(client);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         webTestClient
             .patch()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.valueOf("application/merge-patch+json"))
-            .bodyValue(TestUtil.convertObjectToJsonBytes(client))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(clientDTO))
             .exchange()
             .expectStatus()
             .isEqualTo(405);

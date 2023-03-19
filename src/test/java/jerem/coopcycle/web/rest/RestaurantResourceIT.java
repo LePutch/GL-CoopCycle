@@ -12,6 +12,8 @@ import jerem.coopcycle.IntegrationTest;
 import jerem.coopcycle.domain.Restaurant;
 import jerem.coopcycle.repository.EntityManager;
 import jerem.coopcycle.repository.RestaurantRepository;
+import jerem.coopcycle.service.dto.RestaurantDTO;
+import jerem.coopcycle.service.mapper.RestaurantMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -46,6 +48,9 @@ class RestaurantResourceIT {
 
     @Autowired
     private RestaurantRepository restaurantRepository;
+
+    @Autowired
+    private RestaurantMapper restaurantMapper;
 
     @Autowired
     private EntityManager em;
@@ -100,11 +105,12 @@ class RestaurantResourceIT {
     void createRestaurant() throws Exception {
         int databaseSizeBeforeCreate = restaurantRepository.findAll().collectList().block().size();
         // Create the Restaurant
+        RestaurantDTO restaurantDTO = restaurantMapper.toDto(restaurant);
         webTestClient
             .post()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(restaurant))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(restaurantDTO))
             .exchange()
             .expectStatus()
             .isCreated();
@@ -122,6 +128,7 @@ class RestaurantResourceIT {
     void createRestaurantWithExistingId() throws Exception {
         // Create the Restaurant with an existing ID
         restaurant.setId(1L);
+        RestaurantDTO restaurantDTO = restaurantMapper.toDto(restaurant);
 
         int databaseSizeBeforeCreate = restaurantRepository.findAll().collectList().block().size();
 
@@ -130,7 +137,7 @@ class RestaurantResourceIT {
             .post()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(restaurant))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(restaurantDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -147,12 +154,13 @@ class RestaurantResourceIT {
         restaurant.setName(null);
 
         // Create the Restaurant, which fails.
+        RestaurantDTO restaurantDTO = restaurantMapper.toDto(restaurant);
 
         webTestClient
             .post()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(restaurant))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(restaurantDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -168,12 +176,13 @@ class RestaurantResourceIT {
         restaurant.setAddress(null);
 
         // Create the Restaurant, which fails.
+        RestaurantDTO restaurantDTO = restaurantMapper.toDto(restaurant);
 
         webTestClient
             .post()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(restaurant))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(restaurantDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -256,12 +265,13 @@ class RestaurantResourceIT {
         // Update the restaurant
         Restaurant updatedRestaurant = restaurantRepository.findById(restaurant.getId()).block();
         updatedRestaurant.name(UPDATED_NAME).address(UPDATED_ADDRESS).menu(UPDATED_MENU);
+        RestaurantDTO restaurantDTO = restaurantMapper.toDto(updatedRestaurant);
 
         webTestClient
             .put()
-            .uri(ENTITY_API_URL_ID, updatedRestaurant.getId())
+            .uri(ENTITY_API_URL_ID, restaurantDTO.getId())
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(updatedRestaurant))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(restaurantDTO))
             .exchange()
             .expectStatus()
             .isOk();
@@ -280,12 +290,15 @@ class RestaurantResourceIT {
         int databaseSizeBeforeUpdate = restaurantRepository.findAll().collectList().block().size();
         restaurant.setId(count.incrementAndGet());
 
+        // Create the Restaurant
+        RestaurantDTO restaurantDTO = restaurantMapper.toDto(restaurant);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         webTestClient
             .put()
-            .uri(ENTITY_API_URL_ID, restaurant.getId())
+            .uri(ENTITY_API_URL_ID, restaurantDTO.getId())
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(restaurant))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(restaurantDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -300,12 +313,15 @@ class RestaurantResourceIT {
         int databaseSizeBeforeUpdate = restaurantRepository.findAll().collectList().block().size();
         restaurant.setId(count.incrementAndGet());
 
+        // Create the Restaurant
+        RestaurantDTO restaurantDTO = restaurantMapper.toDto(restaurant);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         webTestClient
             .put()
             .uri(ENTITY_API_URL_ID, count.incrementAndGet())
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(restaurant))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(restaurantDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -320,12 +336,15 @@ class RestaurantResourceIT {
         int databaseSizeBeforeUpdate = restaurantRepository.findAll().collectList().block().size();
         restaurant.setId(count.incrementAndGet());
 
+        // Create the Restaurant
+        RestaurantDTO restaurantDTO = restaurantMapper.toDto(restaurant);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         webTestClient
             .put()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(restaurant))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(restaurantDTO))
             .exchange()
             .expectStatus()
             .isEqualTo(405);
@@ -400,12 +419,15 @@ class RestaurantResourceIT {
         int databaseSizeBeforeUpdate = restaurantRepository.findAll().collectList().block().size();
         restaurant.setId(count.incrementAndGet());
 
+        // Create the Restaurant
+        RestaurantDTO restaurantDTO = restaurantMapper.toDto(restaurant);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         webTestClient
             .patch()
-            .uri(ENTITY_API_URL_ID, restaurant.getId())
+            .uri(ENTITY_API_URL_ID, restaurantDTO.getId())
             .contentType(MediaType.valueOf("application/merge-patch+json"))
-            .bodyValue(TestUtil.convertObjectToJsonBytes(restaurant))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(restaurantDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -420,12 +442,15 @@ class RestaurantResourceIT {
         int databaseSizeBeforeUpdate = restaurantRepository.findAll().collectList().block().size();
         restaurant.setId(count.incrementAndGet());
 
+        // Create the Restaurant
+        RestaurantDTO restaurantDTO = restaurantMapper.toDto(restaurant);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         webTestClient
             .patch()
             .uri(ENTITY_API_URL_ID, count.incrementAndGet())
             .contentType(MediaType.valueOf("application/merge-patch+json"))
-            .bodyValue(TestUtil.convertObjectToJsonBytes(restaurant))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(restaurantDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -440,12 +465,15 @@ class RestaurantResourceIT {
         int databaseSizeBeforeUpdate = restaurantRepository.findAll().collectList().block().size();
         restaurant.setId(count.incrementAndGet());
 
+        // Create the Restaurant
+        RestaurantDTO restaurantDTO = restaurantMapper.toDto(restaurant);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         webTestClient
             .patch()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.valueOf("application/merge-patch+json"))
-            .bodyValue(TestUtil.convertObjectToJsonBytes(restaurant))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(restaurantDTO))
             .exchange()
             .expectStatus()
             .isEqualTo(405);

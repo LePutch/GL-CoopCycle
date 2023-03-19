@@ -22,6 +22,7 @@ public class Paiement implements Serializable {
     private Long id;
 
     @NotNull(message = "must not be null")
+    @DecimalMin(value = "0")
     @Column("amount")
     private Float amount;
 

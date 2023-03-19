@@ -13,6 +13,8 @@ import jerem.coopcycle.domain.Paiement;
 import jerem.coopcycle.domain.enumeration.PaymentType;
 import jerem.coopcycle.repository.EntityManager;
 import jerem.coopcycle.repository.PaiementRepository;
+import jerem.coopcycle.service.dto.PaiementDTO;
+import jerem.coopcycle.service.mapper.PaiementMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,8 +32,8 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 @WithMockUser
 class PaiementResourceIT {
 
-    private static final Float DEFAULT_AMOUNT = 1F;
-    private static final Float UPDATED_AMOUNT = 2F;
+    private static final Float DEFAULT_AMOUNT = 0F;
+    private static final Float UPDATED_AMOUNT = 1F;
 
     private static final PaymentType DEFAULT_PAYMENT_TYPE = PaymentType.CB;
     private static final PaymentType UPDATED_PAYMENT_TYPE = PaymentType.MASTERCARD;
@@ -44,6 +46,9 @@ class PaiementResourceIT {
 
     @Autowired
     private PaiementRepository paiementRepository;
+
+    @Autowired
+    private PaiementMapper paiementMapper;
 
     @Autowired
     private EntityManager em;
@@ -98,11 +103,12 @@ class PaiementResourceIT {
     void createPaiement() throws Exception {
         int databaseSizeBeforeCreate = paiementRepository.findAll().collectList().block().size();
         // Create the Paiement
+        PaiementDTO paiementDTO = paiementMapper.toDto(paiement);
         webTestClient
             .post()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(paiement))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(paiementDTO))
             .exchange()
             .expectStatus()
             .isCreated();
@@ -119,6 +125,7 @@ class PaiementResourceIT {
     void createPaiementWithExistingId() throws Exception {
         // Create the Paiement with an existing ID
         paiement.setId(1L);
+        PaiementDTO paiementDTO = paiementMapper.toDto(paiement);
 
         int databaseSizeBeforeCreate = paiementRepository.findAll().collectList().block().size();
 
@@ -127,7 +134,7 @@ class PaiementResourceIT {
             .post()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(paiement))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(paiementDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -144,12 +151,13 @@ class PaiementResourceIT {
         paiement.setAmount(null);
 
         // Create the Paiement, which fails.
+        PaiementDTO paiementDTO = paiementMapper.toDto(paiement);
 
         webTestClient
             .post()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(paiement))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(paiementDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -165,12 +173,13 @@ class PaiementResourceIT {
         paiement.setPaymentType(null);
 
         // Create the Paiement, which fails.
+        PaiementDTO paiementDTO = paiementMapper.toDto(paiement);
 
         webTestClient
             .post()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(paiement))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(paiementDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -249,12 +258,13 @@ class PaiementResourceIT {
         // Update the paiement
         Paiement updatedPaiement = paiementRepository.findById(paiement.getId()).block();
         updatedPaiement.amount(UPDATED_AMOUNT).paymentType(UPDATED_PAYMENT_TYPE);
+        PaiementDTO paiementDTO = paiementMapper.toDto(updatedPaiement);
 
         webTestClient
             .put()
-            .uri(ENTITY_API_URL_ID, updatedPaiement.getId())
+            .uri(ENTITY_API_URL_ID, paiementDTO.getId())
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(updatedPaiement))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(paiementDTO))
             .exchange()
             .expectStatus()
             .isOk();
@@ -272,12 +282,15 @@ class PaiementResourceIT {
         int databaseSizeBeforeUpdate = paiementRepository.findAll().collectList().block().size();
         paiement.setId(count.incrementAndGet());
 
+        // Create the Paiement
+        PaiementDTO paiementDTO = paiementMapper.toDto(paiement);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         webTestClient
             .put()
-            .uri(ENTITY_API_URL_ID, paiement.getId())
+            .uri(ENTITY_API_URL_ID, paiementDTO.getId())
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(paiement))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(paiementDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -292,12 +305,15 @@ class PaiementResourceIT {
         int databaseSizeBeforeUpdate = paiementRepository.findAll().collectList().block().size();
         paiement.setId(count.incrementAndGet());
 
+        // Create the Paiement
+        PaiementDTO paiementDTO = paiementMapper.toDto(paiement);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         webTestClient
             .put()
             .uri(ENTITY_API_URL_ID, count.incrementAndGet())
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(paiement))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(paiementDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -312,12 +328,15 @@ class PaiementResourceIT {
         int databaseSizeBeforeUpdate = paiementRepository.findAll().collectList().block().size();
         paiement.setId(count.incrementAndGet());
 
+        // Create the Paiement
+        PaiementDTO paiementDTO = paiementMapper.toDto(paiement);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         webTestClient
             .put()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(paiement))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(paiementDTO))
             .exchange()
             .expectStatus()
             .isEqualTo(405);
@@ -392,12 +411,15 @@ class PaiementResourceIT {
         int databaseSizeBeforeUpdate = paiementRepository.findAll().collectList().block().size();
         paiement.setId(count.incrementAndGet());
 
+        // Create the Paiement
+        PaiementDTO paiementDTO = paiementMapper.toDto(paiement);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         webTestClient
             .patch()
-            .uri(ENTITY_API_URL_ID, paiement.getId())
+            .uri(ENTITY_API_URL_ID, paiementDTO.getId())
             .contentType(MediaType.valueOf("application/merge-patch+json"))
-            .bodyValue(TestUtil.convertObjectToJsonBytes(paiement))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(paiementDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -412,12 +434,15 @@ class PaiementResourceIT {
         int databaseSizeBeforeUpdate = paiementRepository.findAll().collectList().block().size();
         paiement.setId(count.incrementAndGet());
 
+        // Create the Paiement
+        PaiementDTO paiementDTO = paiementMapper.toDto(paiement);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         webTestClient
             .patch()
             .uri(ENTITY_API_URL_ID, count.incrementAndGet())
             .contentType(MediaType.valueOf("application/merge-patch+json"))
-            .bodyValue(TestUtil.convertObjectToJsonBytes(paiement))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(paiementDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -432,12 +457,15 @@ class PaiementResourceIT {
         int databaseSizeBeforeUpdate = paiementRepository.findAll().collectList().block().size();
         paiement.setId(count.incrementAndGet());
 
+        // Create the Paiement
+        PaiementDTO paiementDTO = paiementMapper.toDto(paiement);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         webTestClient
             .patch()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.valueOf("application/merge-patch+json"))
-            .bodyValue(TestUtil.convertObjectToJsonBytes(paiement))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(paiementDTO))
             .exchange()
             .expectStatus()
             .isEqualTo(405);

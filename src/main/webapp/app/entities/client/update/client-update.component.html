@@ -24,6 +24,22 @@
             >
               This field is required.
             </small>
+            <small
+              class="form-text text-danger"
+              *ngIf="editForm.get('firstName')?.errors?.minlength"
+              jhiTranslate="entity.validation.minlength"
+              [translateValues]="{ min: 2 }"
+            >
+              This field is required to be at least 2 characters.
+            </small>
+            <small
+              class="form-text text-danger"
+              *ngIf="editForm.get('firstName')?.errors?.maxlength"
+              jhiTranslate="entity.validation.maxlength"
+              [translateValues]="{ max: 50 }"
+            >
+              This field cannot be longer than 50 characters.
+            </small>
           </div>
         </div>
 
@@ -38,6 +54,22 @@
             >
               This field is required.
             </small>
+            <small
+              class="form-text text-danger"
+              *ngIf="editForm.get('lastName')?.errors?.minlength"
+              jhiTranslate="entity.validation.minlength"
+              [translateValues]="{ min: 2 }"
+            >
+              This field is required to be at least 2 characters.
+            </small>
+            <small
+              class="form-text text-danger"
+              *ngIf="editForm.get('lastName')?.errors?.maxlength"
+              jhiTranslate="entity.validation.maxlength"
+              [translateValues]="{ max: 50 }"
+            >
+              This field cannot be longer than 50 characters.
+            </small>
           </div>
         </div>
 
@@ -48,6 +80,14 @@
             <small class="form-text text-danger" *ngIf="editForm.get('email')?.errors?.required" jhiTranslate="entity.validation.required">
               This field is required.
             </small>
+            <small
+              class="form-text text-danger"
+              *ngIf="editForm.get('email')?.errors?.pattern"
+              jhiTranslate="entity.validation.pattern"
+              [translateValues]="{ pattern: 'Email' }"
+            >
+              This field should follow pattern for Email.
+            </small>
           </div>
         </div>
 
@@ -57,6 +97,14 @@
           <div *ngIf="editForm.get('phone')!.invalid && (editForm.get('phone')!.dirty || editForm.get('phone')!.touched)">
             <small class="form-text text-danger" *ngIf="editForm.get('phone')?.errors?.required" jhiTranslate="entity.validation.required">
               This field is required.
+            </small>
+            <small
+              class="form-text text-danger"
+              *ngIf="editForm.get('phone')?.errors?.pattern"
+              jhiTranslate="entity.validation.pattern"
+              [translateValues]="{ pattern: 'Phone' }"
+            >
+              This field should follow pattern for Phone.
             </small>
           </div>
         </div>
@@ -71,6 +119,22 @@
               jhiTranslate="entity.validation.required"
             >
               This field is required.
+            </small>
+            <small
+              class="form-text text-danger"
+              *ngIf="editForm.get('address')?.errors?.minlength"
+              jhiTranslate="entity.validation.minlength"
+              [translateValues]="{ min: 5 }"
+            >
+              This field is required to be at least 5 characters.
+            </small>
+            <small
+              class="form-text text-danger"
+              *ngIf="editForm.get('address')?.errors?.maxlength"
+              jhiTranslate="entity.validation.maxlength"
+              [translateValues]="{ max: 100 }"
+            >
+              This field cannot be longer than 100 characters.
             </small>
           </div>
         </div>

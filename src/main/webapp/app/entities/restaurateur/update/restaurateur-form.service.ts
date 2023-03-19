@@ -42,10 +42,10 @@ export class RestaurateurFormService {
         }
       ),
       firstName: new FormControl(restaurateurRawValue.firstName, {
-        validators: [Validators.required],
+        validators: [Validators.required, Validators.minLength(2), Validators.maxLength(50)],
       }),
       lastName: new FormControl(restaurateurRawValue.lastName, {
-        validators: [Validators.required],
+        validators: [Validators.required, Validators.minLength(2), Validators.maxLength(50)],
       }),
       commande: new FormControl(restaurateurRawValue.commande),
       societaire: new FormControl(restaurateurRawValue.societaire),

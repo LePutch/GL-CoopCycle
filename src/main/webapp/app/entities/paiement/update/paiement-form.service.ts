@@ -40,7 +40,7 @@ export class PaiementFormService {
         }
       ),
       amount: new FormControl(paiementRawValue.amount, {
-        validators: [Validators.required],
+        validators: [Validators.required, Validators.min(0)],
       }),
       paymentType: new FormControl(paiementRawValue.paymentType, {
         validators: [Validators.required],

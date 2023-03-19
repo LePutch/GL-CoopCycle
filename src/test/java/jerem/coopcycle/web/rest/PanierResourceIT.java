@@ -12,6 +12,8 @@ import jerem.coopcycle.IntegrationTest;
 import jerem.coopcycle.domain.Panier;
 import jerem.coopcycle.repository.EntityManager;
 import jerem.coopcycle.repository.PanierRepository;
+import jerem.coopcycle.service.dto.PanierDTO;
+import jerem.coopcycle.service.mapper.PanierMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,8 +34,8 @@ class PanierResourceIT {
     private static final String DEFAULT_DESCRIPTION = "AAAAAAAAAA";
     private static final String UPDATED_DESCRIPTION = "BBBBBBBBBB";
 
-    private static final Float DEFAULT_PRICE = 1F;
-    private static final Float UPDATED_PRICE = 2F;
+    private static final Float DEFAULT_PRICE = 0F;
+    private static final Float UPDATED_PRICE = 1F;
 
     private static final String ENTITY_API_URL = "/api/paniers";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
@@ -43,6 +45,9 @@ class PanierResourceIT {
 
     @Autowired
     private PanierRepository panierRepository;
+
+    @Autowired
+    private PanierMapper panierMapper;
 
     @Autowired
     private EntityManager em;
@@ -97,11 +102,12 @@ class PanierResourceIT {
     void createPanier() throws Exception {
         int databaseSizeBeforeCreate = panierRepository.findAll().collectList().block().size();
         // Create the Panier
+        PanierDTO panierDTO = panierMapper.toDto(panier);
         webTestClient
             .post()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(panier))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(panierDTO))
             .exchange()
             .expectStatus()
             .isCreated();
@@ -118,6 +124,7 @@ class PanierResourceIT {
     void createPanierWithExistingId() throws Exception {
         // Create the Panier with an existing ID
         panier.setId(1L);
+        PanierDTO panierDTO = panierMapper.toDto(panier);
 
         int databaseSizeBeforeCreate = panierRepository.findAll().collectList().block().size();
 
@@ -126,7 +133,7 @@ class PanierResourceIT {
             .post()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(panier))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(panierDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -143,12 +150,13 @@ class PanierResourceIT {
         panier.setPrice(null);
 
         // Create the Panier, which fails.
+        PanierDTO panierDTO = panierMapper.toDto(panier);
 
         webTestClient
             .post()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(panier))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(panierDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -227,12 +235,13 @@ class PanierResourceIT {
         // Update the panier
         Panier updatedPanier = panierRepository.findById(panier.getId()).block();
         updatedPanier.description(UPDATED_DESCRIPTION).price(UPDATED_PRICE);
+        PanierDTO panierDTO = panierMapper.toDto(updatedPanier);
 
         webTestClient
             .put()
-            .uri(ENTITY_API_URL_ID, updatedPanier.getId())
+            .uri(ENTITY_API_URL_ID, panierDTO.getId())
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(updatedPanier))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(panierDTO))
             .exchange()
             .expectStatus()
             .isOk();
@@ -250,12 +259,15 @@ class PanierResourceIT {
         int databaseSizeBeforeUpdate = panierRepository.findAll().collectList().block().size();
         panier.setId(count.incrementAndGet());
 
+        // Create the Panier
+        PanierDTO panierDTO = panierMapper.toDto(panier);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         webTestClient
             .put()
-            .uri(ENTITY_API_URL_ID, panier.getId())
+            .uri(ENTITY_API_URL_ID, panierDTO.getId())
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(panier))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(panierDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -270,12 +282,15 @@ class PanierResourceIT {
         int databaseSizeBeforeUpdate = panierRepository.findAll().collectList().block().size();
         panier.setId(count.incrementAndGet());
 
+        // Create the Panier
+        PanierDTO panierDTO = panierMapper.toDto(panier);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         webTestClient
             .put()
             .uri(ENTITY_API_URL_ID, count.incrementAndGet())
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(panier))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(panierDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -290,12 +305,15 @@ class PanierResourceIT {
         int databaseSizeBeforeUpdate = panierRepository.findAll().collectList().block().size();
         panier.setId(count.incrementAndGet());
 
+        // Create the Panier
+        PanierDTO panierDTO = panierMapper.toDto(panier);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         webTestClient
             .put()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(panier))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(panierDTO))
             .exchange()
             .expectStatus()
             .isEqualTo(405);
@@ -368,12 +386,15 @@ class PanierResourceIT {
         int databaseSizeBeforeUpdate = panierRepository.findAll().collectList().block().size();
         panier.setId(count.incrementAndGet());
 
+        // Create the Panier
+        PanierDTO panierDTO = panierMapper.toDto(panier);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         webTestClient
             .patch()
-            .uri(ENTITY_API_URL_ID, panier.getId())
+            .uri(ENTITY_API_URL_ID, panierDTO.getId())
             .contentType(MediaType.valueOf("application/merge-patch+json"))
-            .bodyValue(TestUtil.convertObjectToJsonBytes(panier))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(panierDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -388,12 +409,15 @@ class PanierResourceIT {
         int databaseSizeBeforeUpdate = panierRepository.findAll().collectList().block().size();
         panier.setId(count.incrementAndGet());
 
+        // Create the Panier
+        PanierDTO panierDTO = panierMapper.toDto(panier);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         webTestClient
             .patch()
             .uri(ENTITY_API_URL_ID, count.incrementAndGet())
             .contentType(MediaType.valueOf("application/merge-patch+json"))
-            .bodyValue(TestUtil.convertObjectToJsonBytes(panier))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(panierDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -408,12 +432,15 @@ class PanierResourceIT {
         int databaseSizeBeforeUpdate = panierRepository.findAll().collectList().block().size();
         panier.setId(count.incrementAndGet());
 
+        // Create the Panier
+        PanierDTO panierDTO = panierMapper.toDto(panier);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         webTestClient
             .patch()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.valueOf("application/merge-patch+json"))
-            .bodyValue(TestUtil.convertObjectToJsonBytes(panier))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(panierDTO))
             .exchange()
             .expectStatus()
             .isEqualTo(405);

@@ -42,12 +42,14 @@ export class RestaurantFormService {
         }
       ),
       name: new FormControl(restaurantRawValue.name, {
-        validators: [Validators.required],
+        validators: [Validators.required, Validators.minLength(2), Validators.maxLength(100)],
       }),
       address: new FormControl(restaurantRawValue.address, {
-        validators: [Validators.required],
+        validators: [Validators.required, Validators.minLength(5), Validators.maxLength(100)],
       }),
-      menu: new FormControl(restaurantRawValue.menu),
+      menu: new FormControl(restaurantRawValue.menu, {
+        validators: [Validators.maxLength(500)],
+      }),
       restaurateur: new FormControl(restaurantRawValue.restaurateur),
     });
   }

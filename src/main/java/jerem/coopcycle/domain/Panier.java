@@ -22,10 +22,12 @@ public class Panier implements Serializable {
     @Column("id")
     private Long id;
 
+    @Size(min = 5, max = 500)
     @Column("description")
     private String description;
 
     @NotNull(message = "must not be null")
+    @DecimalMin(value = "0")
     @Column("price")
     private Float price;
 

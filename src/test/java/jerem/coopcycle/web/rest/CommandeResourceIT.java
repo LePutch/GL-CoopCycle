@@ -16,6 +16,8 @@ import jerem.coopcycle.domain.Panier;
 import jerem.coopcycle.domain.enumeration.CommandeStatus;
 import jerem.coopcycle.repository.CommandeRepository;
 import jerem.coopcycle.repository.EntityManager;
+import jerem.coopcycle.service.dto.CommandeDTO;
+import jerem.coopcycle.service.mapper.CommandeMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,6 +49,9 @@ class CommandeResourceIT {
 
     @Autowired
     private CommandeRepository commandeRepository;
+
+    @Autowired
+    private CommandeMapper commandeMapper;
 
     @Autowired
     private EntityManager em;
@@ -110,11 +115,12 @@ class CommandeResourceIT {
     void createCommande() throws Exception {
         int databaseSizeBeforeCreate = commandeRepository.findAll().collectList().block().size();
         // Create the Commande
+        CommandeDTO commandeDTO = commandeMapper.toDto(commande);
         webTestClient
             .post()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(commande))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(commandeDTO))
             .exchange()
             .expectStatus()
             .isCreated();
@@ -131,6 +137,7 @@ class CommandeResourceIT {
     void createCommandeWithExistingId() throws Exception {
         // Create the Commande with an existing ID
         commande.setId(1L);
+        CommandeDTO commandeDTO = commandeMapper.toDto(commande);
 
         int databaseSizeBeforeCreate = commandeRepository.findAll().collectList().block().size();
 
@@ -139,7 +146,7 @@ class CommandeResourceIT {
             .post()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(commande))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(commandeDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -156,12 +163,13 @@ class CommandeResourceIT {
         commande.setDateTime(null);
 
         // Create the Commande, which fails.
+        CommandeDTO commandeDTO = commandeMapper.toDto(commande);
 
         webTestClient
             .post()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(commande))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(commandeDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -177,12 +185,13 @@ class CommandeResourceIT {
         commande.setStatus(null);
 
         // Create the Commande, which fails.
+        CommandeDTO commandeDTO = commandeMapper.toDto(commande);
 
         webTestClient
             .post()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(commande))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(commandeDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -261,12 +270,13 @@ class CommandeResourceIT {
         // Update the commande
         Commande updatedCommande = commandeRepository.findById(commande.getId()).block();
         updatedCommande.dateTime(UPDATED_DATE_TIME).status(UPDATED_STATUS);
+        CommandeDTO commandeDTO = commandeMapper.toDto(updatedCommande);
 
         webTestClient
             .put()
-            .uri(ENTITY_API_URL_ID, updatedCommande.getId())
+            .uri(ENTITY_API_URL_ID, commandeDTO.getId())
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(updatedCommande))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(commandeDTO))
             .exchange()
             .expectStatus()
             .isOk();
@@ -284,12 +294,15 @@ class CommandeResourceIT {
         int databaseSizeBeforeUpdate = commandeRepository.findAll().collectList().block().size();
         commande.setId(count.incrementAndGet());
 
+        // Create the Commande
+        CommandeDTO commandeDTO = commandeMapper.toDto(commande);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         webTestClient
             .put()
-            .uri(ENTITY_API_URL_ID, commande.getId())
+            .uri(ENTITY_API_URL_ID, commandeDTO.getId())
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(commande))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(commandeDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -304,12 +317,15 @@ class CommandeResourceIT {
         int databaseSizeBeforeUpdate = commandeRepository.findAll().collectList().block().size();
         commande.setId(count.incrementAndGet());
 
+        // Create the Commande
+        CommandeDTO commandeDTO = commandeMapper.toDto(commande);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         webTestClient
             .put()
             .uri(ENTITY_API_URL_ID, count.incrementAndGet())
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(commande))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(commandeDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -324,12 +340,15 @@ class CommandeResourceIT {
         int databaseSizeBeforeUpdate = commandeRepository.findAll().collectList().block().size();
         commande.setId(count.incrementAndGet());
 
+        // Create the Commande
+        CommandeDTO commandeDTO = commandeMapper.toDto(commande);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         webTestClient
             .put()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(commande))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(commandeDTO))
             .exchange()
             .expectStatus()
             .isEqualTo(405);
@@ -404,12 +423,15 @@ class CommandeResourceIT {
         int databaseSizeBeforeUpdate = commandeRepository.findAll().collectList().block().size();
         commande.setId(count.incrementAndGet());
 
+        // Create the Commande
+        CommandeDTO commandeDTO = commandeMapper.toDto(commande);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         webTestClient
             .patch()
-            .uri(ENTITY_API_URL_ID, commande.getId())
+            .uri(ENTITY_API_URL_ID, commandeDTO.getId())
             .contentType(MediaType.valueOf("application/merge-patch+json"))
-            .bodyValue(TestUtil.convertObjectToJsonBytes(commande))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(commandeDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -424,12 +446,15 @@ class CommandeResourceIT {
         int databaseSizeBeforeUpdate = commandeRepository.findAll().collectList().block().size();
         commande.setId(count.incrementAndGet());
 
+        // Create the Commande
+        CommandeDTO commandeDTO = commandeMapper.toDto(commande);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         webTestClient
             .patch()
             .uri(ENTITY_API_URL_ID, count.incrementAndGet())
             .contentType(MediaType.valueOf("application/merge-patch+json"))
-            .bodyValue(TestUtil.convertObjectToJsonBytes(commande))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(commandeDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -444,12 +469,15 @@ class CommandeResourceIT {
         int databaseSizeBeforeUpdate = commandeRepository.findAll().collectList().block().size();
         commande.setId(count.incrementAndGet());
 
+        // Create the Commande
+        CommandeDTO commandeDTO = commandeMapper.toDto(commande);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         webTestClient
             .patch()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.valueOf("application/merge-patch+json"))
-            .bodyValue(TestUtil.convertObjectToJsonBytes(commande))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(commandeDTO))
             .exchange()
             .expectStatus()
             .isEqualTo(405);

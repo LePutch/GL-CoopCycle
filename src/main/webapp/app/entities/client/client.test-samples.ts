@@ -4,35 +4,35 @@ export const sampleWithRequiredData: IClient = {
   id: 71655,
   firstName: 'Esta',
   lastName: 'Stamm',
-  email: 'Hosea.Volkman47@gmail.com',
-  phone: '981.379.2056 x899',
-  address: 'Corners',
+  email: "J@m'MUur.6",
+  phone: '+205   (12)  598    7207',
+  address: 'index Facilitator',
 };
 
 export const sampleWithPartialData: IClient = {
-  id: 48240,
-  firstName: 'Destini',
-  lastName: 'Dach',
-  email: 'Kellen_Walker71@yahoo.com',
-  phone: '1-227-820-5074',
-  address: 'reinvent PNG seamless',
+  id: 47029,
+  firstName: 'Fae',
+  lastName: 'Morar',
+  email: 'H@(.k!vK0',
+  phone: ' 732 290     79  17',
+  address: 'Croatia Upgradable SSL',
 };
 
 export const sampleWithFullData: IClient = {
-  id: 41109,
-  firstName: 'Casimer',
-  lastName: 'Bode',
-  email: 'Percy.Abernathy17@hotmail.com',
-  phone: '317.773.2228',
-  address: 'Brand',
+  id: 95629,
+  firstName: 'Weston',
+  lastName: 'Schulist',
+  email: '<d.-+6@P.R52J',
+  phone: '+9(6)   590   2127',
+  address: 'Account schemas Configuration',
 };
 
 export const sampleWithNewData: NewClient = {
-  firstName: 'Kameron',
-  lastName: 'Rau',
-  email: 'Scarlett_VonRueden@gmail.com',
-  phone: '427.517.8525 x29682',
-  address: 'Metrics',
+  firstName: 'Gennaro',
+  lastName: 'Mills',
+  email: '`gM%@MQQ^I.gzBu',
+  phone: '+282  (6)  681 76    12',
+  address: 'invoice',
   id: null,
 };
 

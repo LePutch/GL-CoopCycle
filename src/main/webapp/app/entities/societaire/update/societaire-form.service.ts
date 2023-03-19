@@ -41,10 +41,10 @@ export class SocietaireFormService {
         }
       ),
       firstName: new FormControl(societaireRawValue.firstName, {
-        validators: [Validators.required],
+        validators: [Validators.required, Validators.minLength(2), Validators.maxLength(50)],
       }),
       lastName: new FormControl(societaireRawValue.lastName, {
-        validators: [Validators.required],
+        validators: [Validators.required, Validators.minLength(2), Validators.maxLength(50)],
       }),
       type: new FormControl(societaireRawValue.type, {
         validators: [Validators.required],

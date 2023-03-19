@@ -24,13 +24,16 @@ public class Restaurant implements Serializable {
     private Long id;
 
     @NotNull(message = "must not be null")
+    @Size(min = 2, max = 100)
     @Column("name")
     private String name;
 
     @NotNull(message = "must not be null")
+    @Size(min = 5, max = 100)
     @Column("address")
     private String address;
 
+    @Size(max = 500)
     @Column("menu")
     private String menu;
 

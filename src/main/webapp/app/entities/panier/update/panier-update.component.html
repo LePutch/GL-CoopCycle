@@ -31,6 +31,24 @@
             data-cy="description"
             formControlName="description"
           />
+          <div *ngIf="editForm.get('description')!.invalid && (editForm.get('description')!.dirty || editForm.get('description')!.touched)">
+            <small
+              class="form-text text-danger"
+              *ngIf="editForm.get('description')?.errors?.minlength"
+              jhiTranslate="entity.validation.minlength"
+              [translateValues]="{ min: 5 }"
+            >
+              This field is required to be at least 5 characters.
+            </small>
+            <small
+              class="form-text text-danger"
+              *ngIf="editForm.get('description')?.errors?.maxlength"
+              jhiTranslate="entity.validation.maxlength"
+              [translateValues]="{ max: 500 }"
+            >
+              This field cannot be longer than 500 characters.
+            </small>
+          </div>
         </div>
 
         <div class="row mb-3">
@@ -39,6 +57,14 @@
           <div *ngIf="editForm.get('price')!.invalid && (editForm.get('price')!.dirty || editForm.get('price')!.touched)">
             <small class="form-text text-danger" *ngIf="editForm.get('price')?.errors?.required" jhiTranslate="entity.validation.required">
               This field is required.
+            </small>
+            <small
+              class="form-text text-danger"
+              *ngIf="editForm.get('price')?.errors?.min"
+              jhiTranslate="entity.validation.min"
+              [translateValues]="{ min: 0 }"
+            >
+              This field should be at least 0.
             </small>
             <small class="form-text text-danger" [hidden]="!editForm.get('price')?.errors?.number" jhiTranslate="entity.validation.number">
               This field should be a number.
