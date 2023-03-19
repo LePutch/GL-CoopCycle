@@ -1,0 +1,26 @@
+{
+  "coopcycleApp": {
+    "panier": {
+      "home": {
+        "title": "Paniers",
+        "refreshListLabel": "Liste aktualisieren",
+        "createLabel": "Panier erstellen",
+        "createOrEditLabel": "Panier erstellen oder bearbeiten",
+        "notFound": "Keine Paniers gefunden"
+      },
+      "created": "Panier erstellt mit ID {{ param }}",
+      "updated": "Panier aktualisiert mit ID {{ param }}",
+      "deleted": "Panier gelöscht mit ID {{ param }}",
+      "delete": {
+        "question": "Soll Panier {{ id }} wirklich dauerhaft gelöscht werden?"
+      },
+      "detail": {
+        "title": "Panier"
+      },
+      "id": "Id",
+      "description": "Description",
+      "price": "Price",
+      "restaurant": "Restaurant"
+    }
+  }
+}

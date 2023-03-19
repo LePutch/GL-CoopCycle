@@ -1,0 +1,39 @@
+{
+  "applications": "*",
+  "changelogDate": "20230319150136",
+  "dto": "no",
+  "embedded": false,
+  "entityTableName": "societaire",
+  "fields": [
+    {
+      "fieldName": "firstName",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "lastName",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "type",
+      "fieldType": "SocietaireType",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "LIVREUR,RESTAURATEUR,CLIENT"
+    }
+  ],
+  "fluentMethods": true,
+  "jpaMetamodelFiltering": false,
+  "name": "Societaire",
+  "pagination": "pagination",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityName": "restaurateur",
+      "otherEntityRelationshipName": "societaire",
+      "relationshipName": "restaurateur",
+      "relationshipType": "one-to-many"
+    }
+  ],
+  "service": "no"
+}

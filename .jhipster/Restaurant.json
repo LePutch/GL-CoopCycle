@@ -1,0 +1,43 @@
+{
+  "applications": "*",
+  "changelogDate": "20230319150139",
+  "dto": "no",
+  "embedded": false,
+  "entityTableName": "restaurant",
+  "fields": [
+    {
+      "fieldName": "name",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "address",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "menu",
+      "fieldType": "String"
+    }
+  ],
+  "fluentMethods": true,
+  "jpaMetamodelFiltering": false,
+  "name": "Restaurant",
+  "pagination": "pagination",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityName": "panier",
+      "otherEntityRelationshipName": "restaurant",
+      "relationshipName": "panier",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "restaurateur",
+      "otherEntityRelationshipName": "restaurant",
+      "relationshipName": "restaurateur",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "service": "no"
+}

@@ -1,0 +1,27 @@
+{
+  "applications": "*",
+  "changelogDate": "20230319150142",
+  "dto": "no",
+  "embedded": false,
+  "entityTableName": "paiement",
+  "fields": [
+    {
+      "fieldName": "amount",
+      "fieldType": "Float",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "paymentType",
+      "fieldType": "PaymentType",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "CB,MASTERCARD,VISA,PAYPAL,APPLE_PAY,GOOGLE_PAY,CHEQUE_REPAS,BITCOIN,IZLY"
+    }
+  ],
+  "fluentMethods": true,
+  "jpaMetamodelFiltering": false,
+  "name": "Paiement",
+  "pagination": "pagination",
+  "readOnly": false,
+  "relationships": [],
+  "service": "no"
+}

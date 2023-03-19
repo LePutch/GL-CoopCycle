@@ -1,0 +1,28 @@
+{
+  "coopcycleApp": {
+    "restaurant": {
+      "home": {
+        "title": "Restaurants",
+        "refreshListLabel": "Liste aktualisieren",
+        "createLabel": "Restaurant erstellen",
+        "createOrEditLabel": "Restaurant erstellen oder bearbeiten",
+        "notFound": "Keine Restaurants gefunden"
+      },
+      "created": "Restaurant erstellt mit ID {{ param }}",
+      "updated": "Restaurant aktualisiert mit ID {{ param }}",
+      "deleted": "Restaurant gelöscht mit ID {{ param }}",
+      "delete": {
+        "question": "Soll Restaurant {{ id }} wirklich dauerhaft gelöscht werden?"
+      },
+      "detail": {
+        "title": "Restaurant"
+      },
+      "id": "ID",
+      "name": "Name",
+      "address": "Address",
+      "menu": "Menu",
+      "panier": "Panier",
+      "restaurateur": "Restaurateur"
+    }
+  }
+}

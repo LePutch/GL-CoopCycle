@@ -1,0 +1,27 @@
+{
+  "coopcycleApp": {
+    "societaire": {
+      "home": {
+        "title": "Societaires",
+        "refreshListLabel": "Liste aktualisieren",
+        "createLabel": "Societaire erstellen",
+        "createOrEditLabel": "Societaire erstellen oder bearbeiten",
+        "notFound": "Keine Societaires gefunden"
+      },
+      "created": "Societaire erstellt mit ID {{ param }}",
+      "updated": "Societaire aktualisiert mit ID {{ param }}",
+      "deleted": "Societaire gelöscht mit ID {{ param }}",
+      "delete": {
+        "question": "Soll Societaire {{ id }} wirklich dauerhaft gelöscht werden?"
+      },
+      "detail": {
+        "title": "Societaire"
+      },
+      "id": "ID",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "type": "Type",
+      "restaurateur": "Restaurateur"
+    }
+  }
+}

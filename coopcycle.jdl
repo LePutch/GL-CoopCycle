@@ -1,0 +1,85 @@
+entity Societaire {
+  firstName String required
+  lastName String required
+  type SocietaireType required
+}
+
+enum SocietaireType {
+  LIVREUR,
+  RESTAURATEUR,
+  CLIENT
+}
+
+entity Client {
+  firstName String required
+  lastName String required
+  email String required
+  phone String required
+  address String required
+}
+
+entity Restaurateur {
+  firstName String required
+  lastName String required
+}
+
+entity Restaurant {
+  name String required
+  address String required
+  menu String
+}
+
+entity Commande {
+  dateTime Instant required
+  status CommandeStatus required
+}
+
+enum CommandeStatus {
+  EN_COURS,
+  PRETE,
+  LIVREE
+}
+
+entity Panier {
+  id Long required
+  description String
+  price Float required
+}
+
+entity Paiement {
+  amount Float required
+  paymentType PaymentType required
+}
+
+enum PaymentType {
+  CB,
+  MASTERCARD,
+  VISA,
+  PAYPAL,
+  APPLE_PAY,
+  GOOGLE_PAY,
+  CHEQUE_REPAS,
+  BITCOIN,
+  IZLY
+}
+
+relationship OneToOne {
+  Commande{panier(id) required} to Panier
+}
+
+relationship ManyToOne {
+  Client{commande} to Commande{client}
+  Restaurateur{commande} to Commande{restaurateur}
+  Commande{paiement} to Paiement
+}
+
+relationship OneToMany {
+  Restaurant{panier} to Panier{restaurant}
+  Societaire{restaurateur} to Restaurateur{societaire}
+}
+
+relationship ManyToOne {
+  Restaurant{restaurateur} to Restaurateur{restaurant}
+}
+
+paginate Societaire, Client, Restaurateur, Restaurant, Commande, Panier, Paiement with pagination
